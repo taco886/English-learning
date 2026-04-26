@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英文词汇猜猜学</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0 20px;
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            color: #888;
+            font-size: 0.95rem;
+        }
+        
+        /* 输入区域 */
+        .input-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-family: Georgia, 'Times New Roman', serif;
+            resize: vertical;
+            min-height: 150px;
+            margin-bottom: 15px;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
+        .text-input::placeholder {
+            color: #666;
+        }
+        
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(79,172,254,0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            color: #1a1a2e;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* 学习区域 */
+        .learning-section {
+            display: none;
+        }
+        
+        .learning-section.active {
+            display: block;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.95rem;
+        }
+        
+        .stat-icon {
+            font-size: 1.1rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        /* 句子卡片 */
+        .sentence-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sentence-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .sentence-number {
+            color: #4facfe;
+            font-weight: 600;
+        }
+        
+        .sentence-nav {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .chinese-sentence {
+            font-size: 1.15rem;
+            color: #fee140;
+            padding: 15px;
+            background: rgba(254,225,64,0.1);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #fee140;
+        }
+        
+        .source-sentence {
+            font-size: 1.5rem;
+            line-height: 2.2;
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+        
+        .word {
+            display: inline-block;
+            padding: 8px 14px;
+            background: rgba(79,172,254,0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            font-size: 1.1rem;
+        }
+        
+        .word:hover {
+            background: rgba(79,172,254,0.5);
+            border-color: #4facfe;
+            transform: translateY(-2px);
+        }
+        
+        .word.grammar {
+            background: rgba(250,173,154,0.2);
+            border-color: rgba(250,173,154,0.3);
+        }
+        
+        .word.grammar:hover {
+            background: rgba(250,173,154,0.5);
+            border-color: #fa709a;
+        }
+        
+        .word.guessed {
+            background: rgba(76,175,80,0.3);
+            border-color: #4caf50;
+            cursor: default;
+        }
+        
+        .word.guessed:hover {
+            transform: none;
+        }
+        
+        .word.wrong {
+            background: rgba(244,67,54,0.3);
+            border-color: #f44336;
+        }
+        
+        .word.skipped {
+            background: rgba(255,193,7,0.2);
+            border-color: rgba(255,193,7,0.4);
+            cursor: default;
+        }
+        
+        .word.skipped:hover {
+            transform: none;
+        }
+        
+        /* 猜词面板 */
+        .guess-panel {
+            display: none;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid #4facfe;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .guess-panel.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .guess-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .guess-word {
+            font-size: 2.5rem;
+            font-family: Georgia, 'Times New Roman', serif;
+            color: #4facfe;
+        }
+        
+        .guess-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .audio-btn {
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .audio-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .close-btn {
+            padding: 10px 16px;
+            background: rgba(244,67,54,0.2);
+            border: none;
+            border-radius: 8px;
+            color: #f44336;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        /* 提示区域 */
+        .hint-area {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .hint-label {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        
+        .hint-text {
+            color: #fee140;
+            font-size: 1rem;
+        }
+        
+        /* 语法词说明 */
+        .grammar-info {
+            background: rgba(250,173,154,0.15);
+            border-left: 4px solid #fa709a;
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 15px;
+        }
+        
+        .grammar-info h4 {
+            color: #fa709a;
+            margin-bottom: 8px;
+        }
+        
+        .grammar-info p {
+            color: #ccc;
+            font-size: 0.95rem;
+        }
+        
+        .grammar-example {
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-family: Georgia, serif;
+            color: #fff;
+        }
+        
+        /* 输入区域 */
+        .input-area {
+            margin-bottom: 15px;
+        }
+        
+        .guess-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3rem;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+        
+        .guess-input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
+        .guess-hint {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+        
+        /* 按钮行 */
+        .submit-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        /* 结果区域 */
+        .result-panel {
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .result-panel.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .result-panel.correct {
+            background: rgba(76,175,80,0.2);
+            border: 1px solid rgba(76,175,80,0.5);
+        }
+        
+        .result-panel.wrong {
+            background: rgba(244,67,54,0.2);
+            border: 1px solid rgba(244,67,54,0.5);
+        }
+        
+        .result-panel.skip {
+            background: rgba(255,193,7,0.2);
+            border: 1px solid rgba(255,193,7,0.5);
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .result-panel.correct .result-title { color: #4caf50; }
+        .result-panel.wrong .result-title { color: #f44336; }
+        .result-panel.skip .result-title { color: #ffc107; }
+        
+        .result-answer {
+            background: rgba(255,255,255,0.05);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .result-answer strong {
+            color: #4facfe;
+        }
+        
+        .result-explanation {
+            color: #aaa;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .result-alternatives {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* 控制按钮 */
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        /* 完成卡片 */
+        .complete-card {
+            text-align: center;
+            padding: 50px 30px;
+        }
+        
+        .complete-card h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .complete-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .complete-stat {
+            text-align: center;
+        }
+        
+        .complete-stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4facfe;
+        }
+        
+        .complete-stat-label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* 复习模式提示 */
+        .review-banner {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            color: #1a1a2e;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        /* 加载状态 */
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 词性标签 */
+        .pos-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(79,172,254,0.2);
+            color: #4facfe;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+        
+        .correct-label {
+            color: #4facfe;
+            font-size: 0.9rem;
+        }
+        
+        /* 单词卡片显示 */
+        .word-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .word-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .word-card-english {
+            font-size: 2rem;
+            color: #4facfe;
+            font-family: Georgia, serif;
+        }
+        
+        .word-card-phonetic {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .word-card-translation {
+            font-size: 1.2rem;
+            color: #fee140;
+            margin-top: 5px;
+        }
+        
+        /* 句子语境卡片 */
+        .context-card {
+            background: rgba(254,225,64,0.1);
+            border-left: 4px solid #fee140;
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .context-label {
+            color: #fee140;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        
+        /* 底部提示 */
+        .tip-panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        @media (max-width: 600px) {
+            .source-sentence {
+                font-size: 1.2rem;
+            }
+            
+            .word {
+                font-size: 1rem;
+                padding: 6px 10px;
+            }
+            
+            .guess-word {
+                font-size: 1.8rem;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 英文词汇猜猜学</h1>
+            <p>粘贴英文句子，逐词学习，语法词直接告诉你</p>
+        </header>
+        
+        <div class="input-section" id="inputSection">
+            <textarea class="text-input" id="sourceText" placeholder="粘贴英文句子...
+
+例如：
+I am looking at the beautiful sky. The weather is very nice today.
+When I was a child, I lived in Canada with my family."></textarea>
+            
+            <div class="btn-row">
+                <button class="btn btn-primary" id="startBtn" onclick="startLearning()">
+                    🚀 开始学习
+                </button>
+                <button class="btn btn-warning" id="reviewBtn" onclick="startReview()" style="display:none">
+                    📝 复习易错词
+                </button>
+            </div>
+        </div>
+        
+        <div class="learning-section" id="learningSection">
+            <div class="review-banner" id="reviewBanner" style="display:none">
+                📝 复习模式 - 这些词之前答错过
+            </div>
+            
+            <div class="status-bar">
+                <div class="stats">
+                    <span class="stat">
+                        <span class="stat-icon">✅</span>
+                        <span id="correctCount">0</span>/<span id="totalCount">0</span>
+                    </span>
+                    <span class="stat">
+                        <span class="stat-icon">⏭️</span>
+                        跳过 <span id="skipCount">0</span>
+                    </span>
+                    <span class="stat">
+                        <span class="stat-icon">📊</span>
+                        <span id="accuracy">0</span>%
+                    </span>
+                </div>
+                <button class="btn btn-secondary" onclick="resetLearning()">📝 重新输入</button>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div id="sentenceContainer"></div>
+            
+            <div class="controls" id="controls"></div>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== 核心数据 ====================
+        
+        // 英文语法词（直接显示答案，不让猜）
+        const grammarWords = {
+            // 冠词
+            'the': { answer: '（特指）这/那', explanation: '定冠词，用于特指前文提到过或双方都知道的事物。中文没有对应词，靠语境理解。', example: 'The book is mine. → 那本书是我的。' },
+            'a': { answer: '（泛指）一/一个', explanation: '不定冠词，用于泛指单数可数名词。中文用"一个"或直接省略。', example: 'I am a student. → 我是一个学生。' },
+            'an': { answer: '（泛指）一/一个', explanation: '不定冠词，用于元音字母开头的词前，发音与 a 相同。', example: 'an apple → 一个苹果' },
+            
+            // be动词
+            'is': { answer: '是', explanation: 'be动词第三人称单数现在式。' },
+            'are': { answer: '是', explanation: 'be动词复数现在式（你/我/他们等）。' },
+            'was': { answer: '是（过去）', explanation: 'be动词过去式（单数）' },
+            'were': { answer: '是（过去）', explanation: 'be动词过去式（复数）' },
+            'be': { answer: '是/成为', explanation: 'be动词原形，用于不定式或虚拟语气。' },
+            'been': { answer: '曾经是', explanation: 'be动词的完成式形式。' },
+            'being': { answer: '正在是', explanation: 'be动词进行式形式。' },
+            
+            // 助动词
+            'have': { answer: '有/已经', explanation: '助动词，用于现在完成时；行为动词表示"拥有"。' },
+            'has': { answer: '有/已经', explanation: 'have 的第三人称单数形式。' },
+            'had': { answer: '有/已经（过去）', explanation: '过去式/过去完成式。' },
+            'do': { answer: '做/用于疑问', explanation: '行为动词"做"；助动词用于构成疑问句和否定句。' },
+            'does': { answer: '做/用于疑问', explanation: 'do 的第三人称单数。' },
+            'did': { answer: '做/用于疑问（过去）', explanation: 'do 的过去式。' },
+            'will': { answer: '将/会', explanation: '将来时助动词。' },
+            'would': { answer: '将/会/愿意', explanation: '过去将来时，或表示委婉/意愿。' },
+            'could': { answer: '能/可以', explanation: 'can 的过去式，表示能力或许可。' },
+            'should': { answer: '应该', explanation: '表示建议、义务。' },
+            'may': { answer: '可能/可以', explanation: '表示可能性或允许。' },
+            'might': { answer: '也许', explanation: 'may 的过去式，表示较小可能性。' },
+            'must': { answer: '必须', explanation: '表示义务、必要性。' },
+            'can': { answer: '能/会', explanation: '表示能力或许可。' },
+            
+            // to
+            'to': { answer: '到/为了', explanation: '不定式符号；介词表示方向"向..."。' },
+            
+            // 介词
+            'of': { answer: '的', explanation: '所有关系，相当于"...的"。注意：中文的"的"有时省略。', example: 'a book of mine → 我的一本书（的书）' },
+            'in': { answer: '在...里/在...期间', explanation: '地点（内部）；时间（期间）。中文说"在"但位置不同。' },
+            'for': { answer: '为了/对于/持续', explanation: '目的（为了）；对象（对于）；时间长度（持续）。' },
+            'on': { answer: '在...上面/关于', explanation: '表面接触（上面）；某天（on Monday）；话题（关于）。' },
+            'with': { answer: '和...一起/用...', explanation: '伴随（和一起）；工具（用...）。' },
+            'at': { answer: '在（某点）', explanation: '地点（某处）；时间（某刻）。通常指较小地点或精确时间点。' },
+            'by': { answer: '通过/被/在...旁边', explanation: '方式（通过）；被动（被）；位置（在...旁）。' },
+            'from': { answer: '从...', explanation: '起点（从哪里）；来源（来自）。' },
+            'as': { answer: '作为/像...一样', explanation: '身份（作为）；方式（像...一样）；原因。' },
+            'into': { answer: '进入...里', explanation: '表示方向，进入某物内部。' },
+            'through': { answer: '穿过/通过', explanation: '空间上穿过某物。' },
+            'over': { answer: '在...上方/超过', explanation: '空间（上方）；数量（超过）。' },
+            'under': { answer: '在...下方', explanation: '空间位置。' },
+            'between': { answer: '在...之间', explanation: '两者之间。' },
+            'among': { answer: '在...之中', explanation: '三者或以上之中。' },
+            'about': { answer: '关于/大约', explanation: '话题（关于）；数量（大约）。' },
+            'after': { answer: '在...之后', explanation: '时间顺序。' },
+            'before': { answer: '在...之前', explanation: '时间顺序。' },
+            'until': { answer: '直到...', explanation: '时间持续到某点。' },
+            'since': { answer: '自从...', explanation: '从过去某时到现在。' },
+            'during': { answer: '在...期间', explanation: '时间段内。' },
+            
+            // 连词
+            'and': { answer: '和/而且', explanation: '并列连接。中文常说"而且"、"还有"。' },
+            'but': { answer: '但是', explanation: '转折连接。' },
+            'or': { answer: '或者/否则', explanation: '选择；条件（否则）。' },
+            'so': { answer: '所以/因此', explanation: '因果结果。' },
+            'yet': { answer: '但是/仍然', explanation: '轻微转折。' },
+            'if': { answer: '如果/是否', explanation: '条件（如果）；宾语从句（是否）。' },
+            'when': { answer: '当...时', explanation: '时间从句。中文常说"...的时候"。' },
+            
+            // 关系词
+            'that': { answer: '（引导/无意义）', explanation: '定语从句（那个）；主语/宾语从句（无意义）；that可以省略！' },
+            'which': { answer: '哪个/哪些', explanation: '疑问代词/关系代词。' },
+            'who': { answer: '谁', explanation: '疑问代词/关系代词。' },
+            'whom': { answer: '谁（宾格）', explanation: 'who 的宾格形式。' },
+            'what': { answer: '什么', explanation: '疑问代词。' },
+            'where': { answer: '哪里', explanation: '疑问副词/关系副词。' },
+            'why': { answer: '为什么', explanation: '疑问副词。' },
+            'how': { answer: '怎样/如何', explanation: '疑问副词。' },
+            
+            // 指示词
+            'this': { answer: '这个', explanation: '近指指示词。' },
+            'that': { answer: '那个', explanation: '远指指示词。' },
+            'these': { answer: '这些', explanation: 'this 的复数。' },
+            'those': { answer: '那些', explanation: 'that 的复数。' },
+            
+            // 代词
+            'i': { answer: '我', explanation: '第一人称单数主格。' },
+            'me': { answer: '我（宾格）', explanation: '宾语形式。' },
+            'my': { answer: '我的', explanation: '所有格。' },
+            'mine': { answer: '我的（东西）', explanation: '名词性所有格。' },
+            'you': { answer: '你/你们', explanation: '第二人称。' },
+            'your': { answer: '你的', explanation: '所有格。' },
+            'he': { answer: '他', explanation: '第三人称单数阳性主格。' },
+            'him': { answer: '他（宾格）', explanation: '宾语形式。' },
+            'his': { answer: '他的', explanation: '所有格。' },
+            'she': { answer: '她', explanation: '第三人称单数阴性主格。' },
+            'her': { answer: '她的/她', explanation: '所有格或宾格。' },
+            'it': { answer: '它', explanation: '第三人称单数中性。' },
+            'we': { answer: '我们', explanation: '第一人称复数主格。' },
+            'us': { answer: '我们（宾格）', explanation: '宾语形式。' },
+            'our': { answer: '我们的', explanation: '所有格。' },
+            'they': { answer: '他们', explanation: '第三人称复数主格。' },
+            'them': { answer: '他们（宾格）', explanation: '宾语形式。' },
+            'their': { answer: '他们的', explanation: '所有格。' },
+            
+            // 副词
+            'not': { answer: '不/没有', explanation: '否定副词。中文说"不..."或"没..."。' },
+            'no': { answer: '不/没有', explanation: '否定词（单独使用）。' },
+            'very': { answer: '非常', explanation: '程度副词。中文程度副词位置不同。' },
+            'just': { answer: '刚刚/只是', explanation: '时间（刚刚）；程度（只是）。' },
+            'still': { answer: '仍然', explanation: '持续状态。' },
+            'already': { answer: '已经', explanation: '时间（已完成）。' },
+            'also': { answer: '也', explanation: '同类添加。' },
+            'even': { answer: '甚至', explanation: '程度加强。' },
+            'only': { answer: '只/仅仅', explanation: '限制性副词。' },
+            'too': { answer: '也/太', explanation: '同类添加/程度过高。' },
+            'more': { answer: '更/更多的', explanation: '比较级/更多。' },
+            'most': { answer: '最/大多数', explanation: '最高级/大多数。' },
+            'than': { answer: '比', explanation: '比较句中。' },
+            'some': { answer: '一些', explanation: '不确定数量。' },
+            'any': { answer: '任何/一些', explanation: '疑问/否定中。' },
+            'all': { answer: '全部', explanation: '整体。' },
+            'both': { answer: '两者都', explanation: '两个都。' },
+            'each': { answer: '每个', explanation: '个体。' },
+            'much': { answer: '多/很', explanation: '数量/程度。' },
+            'many': { answer: '很多', explanation: '可数名词。' },
+            'little': { answer: '少/小', explanation: '数量少/尺寸小。' },
+            'there': { answer: '那里/（引导）', explanation: '地点副词；there be 句型（引导）。' },
+            'here': { answer: '这里', explanation: '地点副词。' },
+            'now': { answer: '现在', explanation: '时间副词。' },
+            'then': { answer: '然后/那时', explanation: '时间顺序。' },
+            'again': { answer: '再次', explanation: '重复。' },
+            'once': { answer: '一次/曾经', explanation: '频率/过去。' },
+            'always': { answer: '总是', explanation: '频率。' },
+            'sometimes': { answer: '有时', explanation: '频率。' },
+            'often': { answer: '经常', explanation: '频率。' },
+            'never': { answer: '从不', explanation: '频率。' },
+            'really': { answer: '真的', explanation: '程度/确认。' },
+            
+            // 所有格缩写
+            "'s": { answer: '的', explanation: "名词所有格标志，如 John's = 约翰的。" },
+            "'re": { answer: '是', explanation: "are 的缩写，如 they're = 他们是。" },
+            "'ll": { answer: '将/会', explanation: "will 的缩写。" },
+            "'ve": { answer: '有/已经', explanation: "have 的缩写。" },
+            "'d": { answer: '会/已经', explanation: "had/would 的缩写。" },
+        };
+        
+            // 英文词典（让用户猜）- 现在是对象格式 {answer, pos}
+        // 动词（原形）
+        const verbDict = {
+            'am': { answer: '是', pos: 'v.' },
+            'look': { answer: '看', pos: 'v.' },
+            'see': { answer: '看见', pos: 'v.' },
+            'watch': { answer: '观看', pos: 'v.' },
+            'eat': { answer: '吃', pos: 'v.' },
+            'drink': { answer: '喝', pos: 'v.' },
+            'cook': { answer: '烹饪', pos: 'v.' },
+            'go': { answer: '去', pos: 'v.' },
+            'come': { answer: '来', pos: 'v.' },
+            'walk': { answer: '走', pos: 'v.' },
+            'run': { answer: '跑', pos: 'v.' },
+            'fly': { answer: '飞', pos: 'v.' },
+            'say': { answer: '说', pos: 'v.' },
+            'speak': { answer: '说/讲', pos: 'v.' },
+            'talk': { answer: '谈话', pos: 'v.' },
+            'tell': { answer: '告诉', pos: 'v.' },
+            'hear': { answer: '听见', pos: 'v.' },
+            'listen': { answer: '听', pos: 'v.' },
+            'read': { answer: '读', pos: 'v.' },
+            'write': { answer: '写', pos: 'v.' },
+            'love': { answer: '爱', pos: 'v.' },
+            'like': { answer: '喜欢', pos: 'v.' },
+            'hate': { answer: '讨厌', pos: 'v.' },
+            'think': { answer: '想/认为', pos: 'v.' },
+            'want': { answer: '想要', pos: 'v.' },
+            'need': { answer: '需要', pos: 'v.' },
+            'live': { answer: '住/生活', pos: 'v.' },
+            'sleep': { answer: '睡', pos: 'v.' },
+            'sit': { answer: '坐', pos: 'v.' },
+            'stand': { answer: '站', pos: 'v.' },
+            'play': { answer: '玩', pos: 'v.' },
+            'study': { answer: '学习', pos: 'v.' },
+            'learn': { answer: '学习', pos: 'v.' },
+            'teach': { answer: '教', pos: 'v.' },
+            'open': { answer: '开/打开', pos: 'v.' },
+            'close': { answer: '关/关闭', pos: 'v.' },
+            'put': { answer: '放', pos: 'v.' },
+            'take': { answer: '拿/带走', pos: 'v.' },
+            'buy': { answer: '买', pos: 'v.' },
+            'sell': { answer: '卖', pos: 'v.' },
+            'give': { answer: '给', pos: 'v.' },
+            'get': { answer: '得到', pos: 'v.' },
+            'find': { answer: '找到/发现', pos: 'v.' },
+            'know': { answer: '知道', pos: 'v.' },
+            'remember': { answer: '记住', pos: 'v.' },
+            'forget': { answer: '忘记', pos: 'v.' },
+            'meet': { answer: '遇见', pos: 'v.' },
+            'ask': { answer: '问', pos: 'v.' },
+            'answer': { answer: '回答', pos: 'v.' },
+            'help': { answer: '帮助', pos: 'v.' },
+            'feel': { answer: '感觉', pos: 'v.' },
+            'understand': { answer: '理解', pos: 'v.' },
+            'believe': { answer: '相信', pos: 'v.' },
+            'try': { answer: '尝试', pos: 'v.' },
+            'start': { answer: '开始', pos: 'v.' },
+            'stop': { answer: '停止', pos: 'v.' },
+            'stay': { answer: '停留/待', pos: 'v.' },
+            'leave': { answer: '离开', pos: 'v.' },
+            'enjoy': { answer: '享受', pos: 'v.' },
+            'hope': { answer: '希望', pos: 'v.' },
+            'work': { answer: '工作', pos: 'v.' },
+            'call': { answer: '叫/打电话', pos: 'v.' },
+        };
+        
+        // 动词-ing形式
+        const verbIngDict = {
+            'looking': { answer: '看', pos: 'v.' },
+            'seeing': { answer: '看见', pos: 'v.' },
+            'watching': { answer: '观看', pos: 'v.' },
+            'eating': { answer: '吃', pos: 'v.' },
+            'drinking': { answer: '喝', pos: 'v.' },
+            'going': { answer: '去', pos: 'v.' },
+            'coming': { answer: '来', pos: 'v.' },
+            'walking': { answer: '走', pos: 'v.' },
+            'running': { answer: '跑', pos: 'v.' },
+            'flying': { answer: '飞', pos: 'v.' },
+            'saying': { answer: '说', pos: 'v.' },
+            'speaking': { answer: '说', pos: 'v.' },
+            'talking': { answer: '谈话', pos: 'v.' },
+            'reading': { answer: '读', pos: 'v.' },
+            'writing': { answer: '写', pos: 'v.' },
+            'loving': { answer: '爱', pos: 'v.' },
+            'liking': { answer: '喜欢', pos: 'v.' },
+            'hating': { answer: '讨厌', pos: 'v.' },
+            'thinking': { answer: '想', pos: 'v.' },
+            'wanting': { answer: '想要', pos: 'v.' },
+            'needing': { answer: '需要', pos: 'v.' },
+            'living': { answer: '住', pos: 'v.' },
+            'sleeping': { answer: '睡', pos: 'v.' },
+            'playing': { answer: '玩', pos: 'v.' },
+            'studying': { answer: '学习', pos: 'v.' },
+            'learning': { answer: '学习', pos: 'v.' },
+            'working': { answer: '工作', pos: 'v.' },
+            'trying': { answer: '尝试', pos: 'v.' },
+            'helping': { answer: '帮助', pos: 'v.' },
+            'feeling': { answer: '感觉', pos: 'v.' },
+            'knowing': { answer: '知道', pos: 'v.' },
+            'remembering': { answer: '记住', pos: 'v.' },
+            'waiting': { answer: '等待', pos: 'v.' },
+            'using': { answer: '使用', pos: 'v.' },
+            'making': { answer: '做/制造', pos: 'v.' },
+        };
+        
+        // 动词-ed形式
+        const verbEdDict = {
+            'looked': { answer: '看', pos: 'v.' },
+            'saw': { answer: '看见', pos: 'v.' },
+            'watched': { answer: '观看', pos: 'v.' },
+            'ate': { answer: '吃', pos: 'v.' },
+            'drank': { answer: '喝', pos: 'v.' },
+            'went': { answer: '去', pos: 'v.' },
+            'came': { answer: '来', pos: 'v.' },
+            'walked': { answer: '走', pos: 'v.' },
+            'ran': { answer: '跑', pos: 'v.' },
+            'said': { answer: '说', pos: 'v.' },
+            'spoke': { answer: '说', pos: 'v.' },
+            'read': { answer: '读', pos: 'v.' },
+            'wrote': { answer: '写', pos: 'v.' },
+            'loved': { answer: '爱', pos: 'v.' },
+            'liked': { answer: '喜欢', pos: 'v.' },
+            'hated': { answer: '讨厌', pos: 'v.' },
+            'thought': { answer: '想/认为', pos: 'v.' },
+            'wanted': { answer: '想要', pos: 'v.' },
+            'needed': { answer: '需要', pos: 'v.' },
+            'lived': { answer: '住', pos: 'v.' },
+            'slept': { answer: '睡', pos: 'v.' },
+            'worked': { answer: '工作', pos: 'v.' },
+            'played': { answer: '玩', pos: 'v.' },
+            'studied': { answer: '学习', pos: 'v.' },
+            'learned': { answer: '学习', pos: 'v.' },
+            'found': { answer: '找到/发现', pos: 'v.' },
+            'gave': { answer: '给', pos: 'v.' },
+            'took': { answer: '拿', pos: 'v.' },
+            'made': { answer: '做', pos: 'v.' },
+            'knew': { answer: '知道', pos: 'v.' },
+            'remembered': { answer: '记住', pos: 'v.' },
+            'forgot': { answer: '忘记', pos: 'v.' },
+            'started': { answer: '开始', pos: 'v.' },
+            'stopped': { answer: '停止', pos: 'v.' },
+            'asked': { answer: '问', pos: 'v.' },
+            'told': { answer: '告诉', pos: 'v.' },
+        };
+        
+        // 形容词
+        const adjDict = {
+            'beautiful': { answer: '美丽', pos: 'adj.' },
+            'pretty': { answer: '漂亮', pos: 'adj.' },
+            'ugly': { answer: '丑', pos: 'adj.' },
+            'good': { answer: '好', pos: 'adj.' },
+            'great': { answer: '好/棒', pos: 'adj.' },
+            'wonderful': { answer: '棒极了', pos: 'adj.' },
+            'bad': { answer: '坏/差', pos: 'adj.' },
+            'awful': { answer: '糟糕', pos: 'adj.' },
+            'terrible': { answer: '可怕/糟糕', pos: 'adj.' },
+            'big': { answer: '大', pos: 'adj.' },
+            'small': { answer: '小', pos: 'adj.' },
+            'large': { answer: '大', pos: 'adj.' },
+            'huge': { answer: '巨大', pos: 'adj.' },
+            'new': { answer: '新', pos: 'adj.' },
+            'old': { answer: '旧/老', pos: 'adj.' },
+            'young': { answer: '年轻', pos: 'adj.' },
+            'hot': { answer: '热', pos: 'adj.' },
+            'cold': { answer: '冷', pos: 'adj.' },
+            'warm': { answer: '暖和', pos: 'adj.' },
+            'cool': { answer: '凉快/酷', pos: 'adj.' },
+            'happy': { answer: '开心', pos: 'adj.' },
+            'sad': { answer: '伤心', pos: 'adj.' },
+            'angry': { answer: '生气', pos: 'adj.' },
+            'tired': { answer: '累', pos: 'adj.' },
+            'difficult': { answer: '困难', pos: 'adj.' },
+            'easy': { answer: '容易', pos: 'adj.' },
+            'important': { answer: '重要', pos: 'adj.' },
+            'different': { answer: '不同', pos: 'adj.' },
+            'same': { answer: '一样', pos: 'adj.' },
+            'possible': { answer: '可能', pos: 'adj.' },
+            'right': { answer: '正确/右边', pos: 'adj.' },
+            'wrong': { answer: '错误/错', pos: 'adj.' },
+            'true': { answer: '真实', pos: 'adj.' },
+            'real': { answer: '真的', pos: 'adj.' },
+            'late': { answer: '晚/迟', pos: 'adj./adv.' },
+            'early': { answer: '早', pos: 'adj./adv.' },
+            'ready': { answer: '准备好', pos: 'adj.' },
+            'amazing': { answer: '惊人', pos: 'adj.' },
+            'interesting': { answer: '有趣', pos: 'adj.' },
+            'boring': { answer: '无聊', pos: 'adj.' },
+            'delicious': { answer: '好吃', pos: 'adj.' },
+            'nice': { answer: '好/美好', pos: 'adj.' },
+            'lovely': { answer: '可爱', pos: 'adj.' },
+        };
+        
+        // 地名/国家
+        const placeDict = {
+            'canada': { answer: '加拿大', pos: 'n.' },
+            'america': { answer: '美国', pos: 'n.' },
+            'usa': { answer: '美国', pos: 'n.' },
+            'china': { answer: '中国', pos: 'n.' },
+            'japan': { answer: '日本', pos: 'n.' },
+            'korea': { answer: '韩国', pos: 'n.' },
+            'uk': { answer: '英国', pos: 'n.' },
+            'britain': { answer: '英国', pos: 'n.' },
+            'france': { answer: '法国', pos: 'n.' },
+            'germany': { answer: '德国', pos: 'n.' },
+            'russia': { answer: '俄罗斯', pos: 'n.' },
+            'india': { answer: '印度', pos: 'n.' },
+            'brazil': { answer: '巴西', pos: 'n.' },
+            'australia': { answer: '澳大利亚', pos: 'n.' },
+            'toronto': { answer: '多伦多', pos: 'n.' },
+            'vancouver': { answer: '温哥华', pos: 'n.' },
+            'newyork': { answer: '纽约', pos: 'n.' },
+            'nyc': { answer: '纽约', pos: 'n.' },
+            'london': { answer: '伦敦', pos: 'n.' },
+            'paris': { answer: '巴黎', pos: 'n.' },
+            'tokyo': { answer: '东京', pos: 'n.' },
+            'beijing': { answer: '北京', pos: 'n.' },
+            'sydney': { answer: '悉尼', pos: 'n.' },
+            'singapore': { answer: '新加坡', pos: 'n.' },
+            'seoul': { answer: '首尔', pos: 'n.' },
+        };
+        
+        // 人名
+        const nameDict = {
+            'john': { answer: '约翰', pos: 'n.' },
+            'mary': { answer: '玛丽', pos: 'n.' },
+            'james': { answer: '詹姆斯', pos: 'n.' },
+            'sarah': { answer: '莎拉', pos: 'n.' },
+            'tom': { answer: '汤姆', pos: 'n.' },
+            'lucy': { answer: '露西', pos: 'n.' },
+            'jack': { answer: '杰克', pos: 'n.' },
+            'rose': { answer: '玫瑰', pos: 'n.' },
+        };
+        
+        // 其他名词
+        const nounDict = {
+            'food': { answer: '食物', pos: 'n.' },
+            'student': { answer: '学生', pos: 'n.' },
+            'teacher': { answer: '老师', pos: 'n.' },
+            'school': { answer: '学校', pos: 'n.' },
+            'friend': { answer: '朋友', pos: 'n.' },
+            'today': { answer: '今天', pos: 'n./adv.' },
+            'tomorrow': { answer: '明天', pos: 'n./adv.' },
+            'yesterday': { answer: '昨天', pos: 'n./adv.' },
+            'weather': { answer: '天气', pos: 'n.' },
+            'rain': { answer: '雨', pos: 'n.' },
+            'sun': { answer: '太阳', pos: 'n.' },
+            'snow': { answer: '雪', pos: 'n.' },
+            'sky': { answer: '天空', pos: 'n.' },
+            'book': { answer: '书', pos: 'n.' },
+            'paper': { answer: '纸', pos: 'n.' },
+            'phone': { answer: '手机', pos: 'n.' },
+            'computer': { answer: '电脑', pos: 'n.' },
+            'car': { answer: '汽车', pos: 'n.' },
+            'bus': { answer: '公交车', pos: 'n.' },
+            'train': { answer: '火车', pos: 'n.' },
+            'bike': { answer: '自行车', pos: 'n.' },
+            'house': { answer: '房子', pos: 'n.' },
+            'home': { answer: '家', pos: 'n./adv.' },
+            'room': { answer: '房间', pos: 'n.' },
+            'door': { answer: '门', pos: 'n.' },
+            'window': { answer: '窗户', pos: 'n.' },
+            'family': { answer: '家人', pos: 'n.' },
+            'father': { answer: '父亲', pos: 'n.' },
+            'mother': { answer: '母亲', pos: 'n.' },
+            'dad': { answer: '爸爸', pos: 'n.' },
+            'mom': { answer: '妈妈', pos: 'n.' },
+            'brother': { answer: '兄弟', pos: 'n.' },
+            'sister': { answer: '姐妹', pos: 'n.' },
+            'son': { answer: '儿子', pos: 'n.' },
+            'daughter': { answer: '女儿', pos: 'n.' },
+            'time': { answer: '时间', pos: 'n.' },
+            'year': { answer: '年', pos: 'n.' },
+            'month': { answer: '月', pos: 'n.' },
+            'week': { answer: '周', pos: 'n.' },
+            'day': { answer: '天', pos: 'n.' },
+            'hour': { answer: '小时', pos: 'n.' },
+            'minute': { answer: '分钟', pos: 'n.' },
+            'man': { answer: '男人', pos: 'n.' },
+            'woman': { answer: '女人', pos: 'n.' },
+            'boy': { answer: '男孩', pos: 'n.' },
+            'girl': { answer: '女孩', pos: 'n.' },
+            'child': { answer: '孩子', pos: 'n.' },
+            'children': { answer: '孩子们', pos: 'n.' },
+            'people': { answer: '人们', pos: 'n.' },
+            'person': { answer: '人', pos: 'n.' },
+            'name': { answer: '名字', pos: 'n.' },
+            'street': { answer: '街道', pos: 'n.' },
+            'city': { answer: '城市', pos: 'n.' },
+            'country': { answer: '国家', pos: 'n.' },
+            'world': { answer: '世界', pos: 'n.' },
+            'hand': { answer: '手', pos: 'n.' },
+            'face': { answer: '脸', pos: 'n.' },
+            'head': { answer: '头', pos: 'n.' },
+            'eye': { answer: '眼睛', pos: 'n.' },
+            'mouth': { answer: '嘴', pos: 'n.' },
+            'night': { answer: '夜晚', pos: 'n.' },
+            'morning': { answer: '早上', pos: 'n.' },
+            'afternoon': { answer: '下午', pos: 'n.' },
+            'evening': { answer: '晚上', pos: 'n.' },
+            'money': { answer: '钱', pos: 'n.' },
+            'job': { answer: '工作', pos: 'n.' },
+            'business': { answer: '生意', pos: 'n.' },
+            'story': { answer: '故事', pos: 'n.' },
+            'game': { answer: '游戏', pos: 'n.' },
+            'movie': { answer: '电影', pos: 'n.' },
+            'song': { answer: '歌', pos: 'n.' },
+            'music': { answer: '音乐', pos: 'n.' },
+            'tree': { answer: '树', pos: 'n.' },
+            'flower': { answer: '花', pos: 'n.' },
+            'dog': { answer: '狗', pos: 'n.' },
+            'cat': { answer: '猫', pos: 'n.' },
+            'breakfast': { answer: '早餐', pos: 'n.' },
+            'lunch': { answer: '午餐', pos: 'n.' },
+            'dinner': { answer: '晚餐', pos: 'n.' },
+            'egg': { answer: '鸡蛋', pos: 'n.' },
+            'meat': { answer: '肉', pos: 'n.' },
+            'moon': { answer: '月亮', pos: 'n.' },
+            'star': { answer: '星星', pos: 'n.' },
+            'idea': { answer: '想法', pos: 'n.' },
+            'question': { answer: '问题', pos: 'n.' },
+            'answer': { answer: '答案', pos: 'n.' },
+            'plan': { answer: '计划', pos: 'n.' },
+            'decision': { answer: '决定', pos: 'n.' },
+            'result': { answer: '结果', pos: 'n.' },
+            'reason': { answer: '原因', pos: 'n.' },
+            'way': { answer: '方式/路', pos: 'n.' },
+            'place': { answer: '地方', pos: 'n.' },
+            'life': { answer: '生活', pos: 'n.' },
+            'future': { answer: '未来', pos: 'n.' },
+            'past': { answer: '过去', pos: 'n.' },
+            'part': { answer: '部分', pos: 'n.' },
+            'end': { answer: '结束', pos: 'n.' },
+            'water': { answer: '水', pos: 'n.' },
+            'coffee': { answer: '咖啡', pos: 'n.' },
+            'tea': { answer: '茶', pos: 'n.' },
+            'shirt': { answer: '衬衫', pos: 'n.' },
+            'shoe': { answer: '鞋', pos: 'n.' },
+            'bag': { answer: '包', pos: 'n.' },
+            'hat': { answer: '帽子', pos: 'n.' },
+            'party': { answer: '聚会', pos: 'n.' },
+            'meeting': { answer: '会议', pos: 'n.' },
+            'class': { answer: '课', pos: 'n.' },
+            'exam': { answer: '考试', pos: 'n.' },
+            'team': { answer: '团队', pos: 'n.' },
+            'boss': { answer: '老板', pos: 'n.' },
+            'problem': { answer: '问题', pos: 'n.' },
+        };
+        
+        // 副词
+        const adverbDict = {
+            'not': { answer: '不', pos: 'adv.' },
+            'no': { answer: '不/没有', pos: 'adv.' },
+            'very': { answer: '非常', pos: 'adv.' },
+            'just': { answer: '刚刚/只是', pos: 'adv.' },
+            'still': { answer: '仍然', pos: 'adv.' },
+            'already': { answer: '已经', pos: 'adv.' },
+            'also': { answer: '也', pos: 'adv.' },
+            'even': { answer: '甚至', pos: 'adv.' },
+            'only': { answer: '只', pos: 'adv.' },
+            'too': { answer: '也/太', pos: 'adv.' },
+            'more': { answer: '更', pos: 'adv.' },
+            'most': { answer: '最', pos: 'adv.' },
+            'than': { answer: '比', pos: 'conj.' },
+            'some': { answer: '一些', pos: 'det.' },
+            'any': { answer: '任何/一些', pos: 'det.' },
+            'all': { answer: '全部', pos: 'det.' },
+            'both': { answer: '两者都', pos: 'det.' },
+            'each': { answer: '每个', pos: 'det.' },
+            'much': { answer: '多/很', pos: 'det./adv.' },
+            'many': { answer: '很多', pos: 'det.' },
+            'little': { answer: '少', pos: 'det./adj.' },
+            'there': { answer: '那里', pos: 'adv.' },
+            'here': { answer: '这里', pos: 'adv.' },
+            'now': { answer: '现在', pos: 'adv.' },
+            'then': { answer: '然后/那时', pos: 'adv.' },
+            'again': { answer: '再次', pos: 'adv.' },
+            'once': { answer: '一次/曾经', pos: 'adv.' },
+            'always': { answer: '总是', pos: 'adv.' },
+            'sometimes': { answer: '有时', pos: 'adv.' },
+            'often': { answer: '经常', pos: 'adv.' },
+            'never': { answer: '从不', pos: 'adv.' },
+            'really': { answer: '真的', pos: 'adv.' },
+        };
+        
+        // 合并所有词典
+        const dictionary = {
+            ...verbDict,
+            ...verbIngDict,
+            ...verbEdDict,
+            ...adjDict,
+            ...placeDict,
+            ...nameDict,
+            ...nounDict,
+            ...adverbDict,
+        };
+        
+        // 同义词映射（用于宽松判断）
+            // 地名/国家
+            'canada': '加拿大', 'america': '美国', 'usa': '美国', 'us': '美国',
+            'china': '中国', 'japan': '日本', 'korea': '韩国', 'uk': '英国',
+            'britain': '英国', 'france': '法国', 'germany': '德国', 'russia': '俄罗斯',
+            'india': '印度', 'brazil': '巴西', 'australia': '澳大利亚',
+            'toronto': '多伦多', 'vancouver': '温哥华', 'newyork': '纽约', 'nyc': '纽约',
+            'london': '伦敦', 'paris': '巴黎', 'tokyo': '东京', 'beijing': '北京',
+            'sydney': '悉尼', 'singapore': '新加坡', 'seoul': '首尔',
+            
+            // 人名
+            'john': '约翰', 'mary': '玛丽', 'james': '詹姆斯', 'sarah': '莎拉',
+            'tom': '汤姆', 'lucy': '露西', 'jack': '杰克', 'rose': '玫瑰',
+            
+            // 常用动词（原型）
+            'am': '是', 'look': '看', 'see': '看', 'watch': '看',
+            'eat': '吃', 'drink': '喝', 'cook': '烹饪', 'food': '食物',
+            'go': '去', 'come': '来', 'walk': '走', 'run': '跑', 'fly': '飞',
+            'say': '说', 'speak': '说', 'talk': '谈话', 'tell': '告诉',
+            'hear': '听', 'listen': '听',
+            'read': '读', 'write': '写',
+            'love': '爱', 'like': '喜欢', 'hate': '讨厌',
+            'think': '想/认为', 'want': '想要', 'need': '需要',
+            'live': '住/生活', 'sleep': '睡', 'sit': '坐', 'stand': '站',
+            'play': '玩', 'study': '学习', 'learn': '学习', 'teach': '教',
+            'open': '开', 'close': '关', 'put': '放', 'take': '拿/带走',
+            'buy': '买', 'sell': '卖', 'give': '给', 'get': '得到', 'find': '找/发现',
+            'know': '知道', 'remember': '记住', 'forget': '忘记', 'meet': '遇见',
+            'ask': '问', 'answer': '回答', 'help': '帮助',
+            'feel': '感觉', 'understand': '理解', 'believe': '相信', 'try': '尝试',
+            'start': '开始', 'stop': '停止', 'stay': '留下', 'leave': '离开',
+            'enjoy': '享受', 'hope': '希望', 'work': '工作', 'call': '叫/打电话',
+            
+            // 动词-ing形式
+            'looking': '看', 'seeing': '看', 'watching': '看',
+            'eating': '吃', 'drinking': '喝',
+            'going': '去', 'coming': '来', 'walking': '走', 'running': '跑', 'flying': '飞',
+            'saying': '说', 'speaking': '说', 'talking': '说',
+            'reading': '读', 'writing': '写',
+            'loving': '爱', 'liking': '喜欢', 'hating': '讨厌',
+            'thinking': '想', 'wanting': '想要', 'needing': '需要',
+            'living': '住', 'sleeping': '睡',
+            'playing': '玩', 'studying': '学习', 'learning': '学习',
+            'working': '工作', 'trying': '尝试', 'helping': '帮助',
+            'feeling': '感觉', 'knowing': '知道', 'remembering': '记住',
+            'waiting': '等待', 'using': '使用', 'making': '做/制造',
+            
+            // 动词-ed形式
+            'looked': '看', 'saw': '看见', 'watched': '看',
+            'ate': '吃', 'drank': '喝',
+            'went': '去', 'came': '来', 'walked': '走', 'ran': '跑',
+            'said': '说', 'spoke': '说',
+            'read': '读', 'wrote': '写',
+            'loved': '爱', 'liked': '喜欢', 'hated': '讨厌',
+            'thought': '想', 'wanted': '想要', 'needed': '需要',
+            'lived': '住', 'slept': '睡',
+            'worked': '工作', 'played': '玩', 'studied': '学习', 'learned': '学习',
+            'found': '找/发现', 'gave': '给', 'took': '拿', 'made': '做',
+            'knew': '知道', 'remembered': '记住', 'forgot': '忘记',
+            'started': '开始', 'stopped': '停止', 'asked': '问', 'told': '告诉',
+            
+            // 形容词
+            'beautiful': '美丽', 'pretty': '漂亮', 'ugly': '丑',
+            'good': '好', 'great': '好/棒', 'wonderful': '棒极了',
+            'bad': '坏', 'awful': '糟糕', 'terrible': '可怕',
+            'big': '大', 'small': '小', 'large': '大', 'huge': '巨大',
+            'new': '新', 'old': '旧/老', 'young': '年轻',
+            'hot': '热', 'cold': '冷', 'warm': '暖和', 'cool': '凉快',
+            'happy': '开心', 'sad': '伤心', 'angry': '生气', 'tired': '累',
+            'difficult': '困难', 'easy': '容易', 'important': '重要',
+            'different': '不同', 'same': '一样', 'possible': '可能',
+            'right': '正确', 'wrong': '错误', 'true': '真实', 'real': '真的',
+            'late': '晚', 'early': '早', 'ready': '准备好',
+            'amazing': '惊人', 'interesting': '有趣', 'boring': '无聊',
+            'delicious': '好吃', 'nice': '好', 'lovely': '可爱',
+            
+            // 名词
+            'student': { answer: '学生', pos: 'n.' },
+            'teacher': { answer: '老师', pos: 'n.' },
+            'school': { answer: '学校', pos: 'n.' },
+            'friend': { answer: '朋友', pos: 'n.' },
+            'today': { answer: '今天', pos: 'n./adv.' },
+            'tomorrow': { answer: '明天', pos: 'n./adv.' },
+            'yesterday': { answer: '昨天', pos: 'n./adv.' },
+            'weather': { answer: '天气', pos: 'n.' },
+            'rain': { answer: '雨/下雨', pos: 'n./v.' },
+            'sun': { answer: '太阳', pos: 'n.' },
+            'snow': { answer: '雪/下雪', pos: 'n./v.' },
+            'sky': { answer: '天空', pos: 'n.' },
+            'book': { answer: '书', pos: 'n.' },
+            'paper': { answer: '纸/报纸', pos: 'n.' },
+            'phone': { answer: '手机/电话', pos: 'n.' },
+            'computer': { answer: '电脑', pos: 'n.' },
+            'car': { answer: '汽车', pos: 'n.' },
+            'bus': { answer: '公交车', pos: 'n.' },
+            'train': { answer: '火车', pos: 'n.' },
+            'bike': { answer: '自行车', pos: 'n.' },
+            'house': { answer: '房子', pos: 'n.' },
+            'home': { answer: '家', pos: 'n./adv.' },
+            'room': { answer: '房间', pos: 'n.' },
+            'door': { answer: '门', pos: 'n.' },
+            'window': { answer: '窗户', pos: 'n.' },
+            'family': { answer: '家人/家庭', pos: 'n.' },
+            'father': { answer: '父亲', pos: 'n.' },
+            'mother': { answer: '母亲', pos: 'n.' },
+            'dad': { answer: '爸爸', pos: 'n.' },
+            'mom': { answer: '妈妈', pos: 'n.' },
+            'brother': { answer: '兄弟', pos: 'n.' },
+            'sister': { answer: '姐妹', pos: 'n.' },
+            'son': { answer: '儿子', pos: 'n.' },
+            'daughter': { answer: '女儿', pos: 'n.' },
+            'time': { answer: '时间', pos: 'n.' },
+            'year': { answer: '年', pos: 'n.' },
+            'month': { answer: '月', pos: 'n.' },
+            'week': { answer: '周', pos: 'n.' },
+            'day': { answer: '天', pos: 'n.' },
+            'hour': { answer: '小时', pos: 'n.' },
+            'minute': { answer: '分钟', pos: 'n.' },
+            'man': { answer: '男人', pos: 'n.' },
+            'woman': { answer: '女人', pos: 'n.' },
+            'boy': { answer: '男孩', pos: 'n.' },
+            'girl': { answer: '女孩', pos: 'n.' },
+            'child': { answer: '孩子', pos: 'n.' },
+            'children': { answer: '孩子们', pos: 'n.' },
+            'people': { answer: '人们', pos: 'n.' },
+            'person': { answer: '人', pos: 'n.' },
+            'name': { answer: '名字', pos: 'n.' },
+            'street': { answer: '街道', pos: 'n.' },
+            'city': { answer: '城市', pos: 'n.' },
+            'country': { answer: '国家/乡村', pos: 'n.' },
+            'world': { answer: '世界', pos: 'n.' },
+            'hand': { answer: '手', pos: 'n.' },
+            'face': { answer: '脸', pos: 'n.' },
+            'head': { answer: '头', pos: 'n.' },
+            'eye': { answer: '眼睛', pos: 'n.' },
+            'mouth': { answer: '嘴', pos: 'n.' },
+            'night': { answer: '夜晚', pos: 'n.' },
+            'morning': { answer: '早上', pos: 'n.' },
+            'afternoon': { answer: '下午', pos: 'n.' },
+            'evening': { answer: '晚上', pos: 'n.' },
+            'money': { answer: '钱', pos: 'n.' },
+            'job': { answer: '工作', pos: 'n.' },
+            'business': { answer: '生意/商业', pos: 'n.' },
+            'story': { answer: '故事', pos: 'n.' },
+            'game': { answer: '游戏', pos: 'n.' },
+            'movie': { answer: '电影', pos: 'n.' },
+            'song': { answer: '歌', pos: 'n.' },
+            'music': { answer: '音乐', pos: 'n.' },
+            'tree': { answer: '树', pos: 'n.' },
+            'flower': { answer: '花', pos: 'n.' },
+            'dog': { answer: '狗', pos: 'n.' },
+            'cat': { answer: '猫', pos: 'n.' },
+            'breakfast': { answer: '早餐', pos: 'n.' },
+            'lunch': { answer: '午餐', pos: 'n.' },
+            'dinner': { answer: '晚餐', pos: 'n.' },
+            'egg': { answer: '鸡蛋', pos: 'n.' },
+            'meat': { answer: '肉', pos: 'n.' },
+            'moon': { answer: '月亮', pos: 'n.' },
+            'star': { answer: '星星', pos: 'n.' },
+            'idea': { answer: '想法/主意', pos: 'n.' },
+            'question': { answer: '问题', pos: 'n.' },
+            'answer': { answer: '答案/回答', pos: 'n./v.' },
+            'plan': { answer: '计划', pos: 'n./v.' },
+            'decision': { answer: '决定', pos: 'n.' },
+            'result': { answer: '结果', pos: 'n.' },
+            'reason': { answer: '原因/理由', pos: 'n.' },
+            'way': { answer: '方式/路', pos: 'n.' },
+            'place': { answer: '地方', pos: 'n./v.' },
+            'life': { answer: '生活/生命', pos: 'n.' },
+            'future': { answer: '未来', pos: 'n.' },
+            'past': { answer: '过去', pos: 'n./adj.' },
+            'part': { answer: '部分', pos: 'n.' },
+            'end': { answer: '结束/尽头', pos: 'n./v.' },
+            'water': { answer: '水', pos: 'n.' },
+            'coffee': { answer: '咖啡', pos: 'n.' },
+            'tea': { answer: '茶', pos: 'n.' },
+            'shirt': { answer: '衬衫', pos: 'n.' },
+            'shoe': { answer: '鞋', pos: 'n.' },
+            'bag': { answer: '包', pos: 'n.' },
+            'hat': { answer: '帽子', pos: 'n.' },
+            'party': { answer: '聚会/派对', pos: 'n.' },
+            'meeting': { answer: '会议', pos: 'n.' },
+            'class': { answer: '课/班级', pos: 'n.' },
+            'exam': { answer: '考试', pos: 'n.' },
+            'team': { answer: '团队', pos: 'n.' },
+            'boss': { answer: '老板', pos: 'n.' },
+            'problem': { answer: '问题', pos: 'n.' },
+            
+            // 更多动词
+            'cry': { answer: '哭', pos: 'v.' },
+            'laugh': { answer: '笑', pos: 'v.' },
+            'smile': { answer: '微笑', pos: 'v.' },
+            'jump': { answer: '跳', pos: 'v.' },
+            'climb': { answer: '爬/攀爬', pos: 'v.' },
+            'swim': { answer: '游泳', pos: 'v.' },
+            'drive': { answer: '开车', pos: 'v.' },
+            'ride': { answer: '骑', pos: 'v.' },
+            'carry': { answer: '搬运/携带', pos: 'v.' },
+            'wash': { answer: '洗', pos: 'v.' },
+            'clean': { answer: '打扫/清洁', pos: 'v.' },
+            'dance': { answer: '跳舞', pos: 'v.' },
+            'sing': { answer: '唱歌', pos: 'v.' },
+            'paint': { answer: '画/涂色', pos: 'v.' },
+            'build': { answer: '建造', pos: 'v.' },
+            'break': { answer: '打破/损坏', pos: 'v.' },
+            'fix': { answer: '修理/固定', pos: 'v.' },
+            'send': { answer: '发送', pos: 'v.' },
+            'receive': { answer: '收到', pos: 'v.' },
+            'drop': { answer: '掉落/放下', pos: 'v.' },
+            'miss': { answer: '想念/错过', pos: 'v.' },
+            'save': { answer: '保存/拯救', pos: 'v.' },
+            'share': { answer: '分享', pos: 'v.' },
+            'visit': { answer: '拜访/访问', pos: 'v.' },
+            'change': { answer: '改变/换', pos: 'v.' },
+            'grow': { answer: '成长/种植', pos: 'v.' },
+            'cut': { answer: '切/剪', pos: 'v.' },
+            'hit': { answer: '打/击', pos: 'v.' },
+            'push': { answer: '推', pos: 'v.' },
+            'pull': { answer: '拉', pos: 'v.' },
+            'cover': { answer: '覆盖/盖住', pos: 'v.' },
+            'die': { answer: '死', pos: 'v.' },
+            'live': { answer: '住/生活/活着', pos: 'v.' },
+            'use': { answer: '使用', pos: 'v.' },
+            'wait': { answer: '等待', pos: 'v.' },
+            'agree': { answer: '同意', pos: 'v.' },
+            'appear': { answer: '出现/似乎', pos: 'v.' },
+            'bring': { answer: '带来', pos: 'v.' },
+            'carry': { answer: '携带', pos: 'v.' },
+            'become': { answer: '成为', pos: 'v.' },
+            'hold': { answer: '握住/持有', pos: 'v.' },
+            'pay': { answer: '支付/付钱', pos: 'v.' },
+            'let': { answer: '让/允许', pos: 'v.' },
+            'set': { answer: '设置/放', pos: 'v.' },
+            'keep': { answer: '保持/保留', pos: 'v.' },
+            'turn': { answer: '转/转向', pos: 'v.' },
+            'show': { answer: '显示/展示', pos: 'v.' },
+            'move': { answer: '移动', pos: 'v.' },
+            'happen': { answer: '发生', pos: 'v.' },
+            'depend': { answer: '依靠/取决于', pos: 'v.' },
+            
+            // 更多形容词
+            'long': { answer: '长/久', pos: 'adj.' },
+            'short': { answer: '短/矮', pos: 'adj.' },
+            'tall': { answer: '高', pos: 'adj.' },
+            'high': { answer: '高/高的', pos: 'adj.' },
+            'low': { answer: '低', pos: 'adj.' },
+            'deep': { answer: '深', pos: 'adj.' },
+            'thick': { answer: '厚/粗', pos: 'adj.' },
+            'thin': { answer: '薄/细/瘦', pos: 'adj.' },
+            'heavy': { answer: '重', pos: 'adj.' },
+            'light': { answer: '轻/光', pos: 'adj.' },
+            'full': { answer: '满/饱', pos: 'adj.' },
+            'empty': { answer: '空', pos: 'adj.' },
+            'fast': { answer: '快', pos: 'adj./adv.' },
+            'slow': { answer: '慢', pos: 'adj./adv.' },
+            'hard': { answer: '难/硬', pos: 'adj./adv.' },
+            'soft': { answer: '软', pos: 'adj.' },
+            'strong': { answer: '强壮/强烈', pos: 'adj.' },
+            'weak': { answer: '弱', pos: 'adj.' },
+            'rich': { answer: '富', pos: 'adj.' },
+            'poor': { answer: '穷/差', pos: 'adj.' },
+            'clean': { answer: '干净', pos: 'adj.' },
+            'dirty': { answer: '脏', pos: 'adj.' },
+            'bright': { answer: '明亮/聪明', pos: 'adj.' },
+            'dark': { answer: '暗/黑', pos: 'adj.' },
+            'quiet': { answer: '安静', pos: 'adj.' },
+            'loud': { answer: '响亮/吵', pos: 'adj.' },
+            'free': { answer: '自由/免费', pos: 'adj.' },
+            'busy': { answer: '忙', pos: 'adj.' },
+            'lazy': { answer: '懒', pos: 'adj.' },
+            'safe': { answer: '安全', pos: 'adj.' },
+            'dangerous': { answer: '危险', pos: 'adj.' },
+            'dead': { answer: '死', pos: 'adj.' },
+            'alive': { answer: '活着', pos: 'adj.' },
+            'healthy': { answer: '健康', pos: 'adj.' },
+            'sick': { answer: '生病', pos: 'adj.' },
+            'hungry': { answer: '饿', pos: 'adj.' },
+            'thirsty': { answer: '渴', pos: 'adj.' },
+            'clever': { answer: '聪明', pos: 'adj.' },
+            'stupid': { answer: '笨', pos: 'adj.' },
+            'brave': { answer: '勇敢', pos: 'adj.' },
+            'shy': { answer: '害羞', pos: 'adj.' },
+            'polite': { answer: '礼貌', pos: 'adj.' },
+            'rude': { answer: '粗鲁', pos: 'adj.' },
+            'strict': { answer: '严格', pos: 'adj.' },
+            'kind': { answer: '善良/种类', pos: 'adj./n.' },
+            'friendly': { answer: '友好', pos: 'adj.' },
+            'special': { answer: '特别', pos: 'adj.' },
+            'common': { answer: '常见/普通', pos: 'adj.' },
+            'natural': { answer: '自然', pos: 'adj.' },
+            'popular': { answer: '流行/受欢迎', pos: 'adj.' },
+            'useful': { answer: '有用', pos: 'adj.' },
+            'useless': { answer: '无用', pos: 'adj.' },
+            'afraid': { answer: '害怕', pos: 'adj.' },
+            'proud': { answer: '骄傲', pos: 'adj.' },
+            'serious': { answer: '严肃/认真', pos: 'adj.' },
+            'certain': { answer: '确定/某个', pos: 'adj.' },
+            'whole': { answer: '整个/全部', pos: 'adj.' },
+            'perfect': { answer: '完美', pos: 'adj.' },
+            
+            // 更多副词
+            'really': { answer: '真的', pos: 'adv.' },
+            'very': { answer: '非常', pos: 'adv.' },
+            'quite': { answer: '相当', pos: 'adv.' },
+            'almost': { answer: '几乎', pos: 'adv.' },
+            'enough': { answer: '足够', pos: 'adv./adj.' },
+            'especially': { answer: '尤其', pos: 'adv.' },
+            'probably': { answer: '可能', pos: 'adv.' },
+            'certainly': { answer: '当然/确定', pos: 'adv.' },
+            'maybe': { answer: '也许', pos: 'adv.' },
+            'perhaps': { answer: '或许', pos: 'adv.' },
+            'actually': { answer: '实际上', pos: 'adv.' },
+            'finally': { answer: '最后/终于', pos: 'adv.' },
+            'suddenly': { answer: '突然', pos: 'adv.' },
+            'recently': { answer: '最近', pos: 'adv.' },
+            'usually': { answer: '通常', pos: 'adv.' },
+            'especially': { answer: '尤其', pos: 'adv.' },
+            'exactly': { answer: '恰好/正是', pos: 'adv.' },
+            'simply': { answer: '简单/只是', pos: 'adv.' },
+            'together': { answer: '一起', pos: 'adv.' },
+            'away': { answer: '离开/远处', pos: 'adv.' },
+            'outside': { answer: '外面', pos: 'adv./n.' },
+            'inside': { answer: '里面', pos: 'adv./n.' },
+            'upstairs': { answer: '楼上', pos: 'adv.' },
+            'downstairs': { answer: '楼下', pos: 'adv.' },
+            'anywhere': { answer: '任何地方', pos: 'adv.' },
+            'somewhere': { answer: '某处', pos: 'adv.' },
+            'everywhere': { answer: '到处', pos: 'adv.' },
+            'otherwise': { answer: '否则', pos: 'adv.' },
+            'instead': { answer: '代替/反而', pos: 'adv.' },
+            'however': { answer: '然而/不过', pos: 'adv.' },
+            
+            // 数词和量词
+            'one': { answer: '一', pos: 'num.' },
+            'two': { answer: '二', pos: 'num.' },
+            'three': { answer: '三', pos: 'num.' },
+            'first': { answer: '第一', pos: 'num.' },
+            'second': { answer: '第二', pos: 'num.' },
+            'third': { answer: '第三', pos: 'num.' },
+            'last': { answer: '最后/上一个', pos: 'adj.' },
+            'next': { answer: '下一个', pos: 'adj./adv.' },
+            
+            // 其他常用词
+            'because': { answer: '因为', pos: 'conj.' },
+            'although': { answer: '虽然', pos: 'conj.' },
+            'unless': { answer: '除非', pos: 'conj.' },
+            'while': { answer: '当...时/然而', pos: 'conj./n.' },
+            'whether': { answer: '是否', pos: 'conj.' },
+            'against': { answer: '反对/靠着', pos: 'prep.' },
+            'without': { answer: '没有/无', pos: 'prep.' },
+            'behind': { answer: '在...后面', pos: 'prep./adv.' },
+            'above': { answer: '在...上面', pos: 'prep./adv.' },
+            'below': { answer: '在...下面', pos: 'prep./adv.' },
+            'near': { answer: '附近/靠近', pos: 'prep./adj.' },
+            'around': { answer: '周围/大约', pos: 'prep./adv.' },
+            'across': { answer: '穿过/横跨', pos: 'prep./adv.' },
+            'along': { answer: '沿着', pos: 'prep./adv.' },
+            'toward': { answer: '朝向', pos: 'prep.' },
+            'towards': { answer: '朝向', pos: 'prep.' },
+            'inside': { answer: '里面/在...内', pos: 'prep./adv.' },
+            'outside': { answer: '外面/在...外', pos: 'prep./adv.' },
+            'nothing': { answer: '什么都没有', pos: 'pron.' },
+            'something': { answer: '某物/某事', pos: 'pron.' },
+            'anything': { answer: '任何事物', pos: 'pron.' },
+            'everything': { answer: '一切', pos: 'pron.' },
+            'nobody': { answer: '没有人', pos: 'pron.' },
+            'somebody': { answer: '某人', pos: 'pron.' },
+            'anybody': { answer: '任何人', pos: 'pron.' },
+            'everybody': { answer: '每个人', pos: 'pron.' },
+            'else': { answer: '其他/另外', pos: 'adv./adj.' },
+            'ever': { answer: '曾经/永远', pos: 'adv.' },
+            'yet': { answer: '还/已经/然而', pos: 'adv.' },
+            'such': { answer: '这样/如此', pos: 'adj./pron.' },
+            'own': { answer: '自己的', pos: 'adj./pron.' },
+            'another': { answer: '另一个', pos: 'adj./pron.' },
+            'certainly': { answer: '当然', pos: 'adv.' },
+            'probably': { answer: '大概', pos: 'adv.' },
+            'actually': { answer: '其实', pos: 'adv.' },
+        };
+        
+        // 同义词映射（宽松判断）- 全部使用字符串格式
+        const synonyms = {
+            // 看相关
+            '看': '看', '看着': '看', '看看': '看', '看到': '看', '看见': '看', '瞧瞧': '看', '观看': '看',
+            // 说/说话相关（最宽松匹配）
+            '说': '说', '说话': '说', '讲话': '说', '告诉': '说', '谈话': '说', '谈论': '说', '交谈': '说', '发言': '说',
+            // 听相关
+            '听': '听', '听到': '听', '聆听': '听', '倾听': '听',
+            // 美丽/漂亮
+            '美丽': '美丽', '漂亮': '美丽', '美': '美丽', '好看': '美丽',
+            // 好相关
+            '好': '好', '棒': '好', '不错': '好', '很好': '好', '优秀': '好',
+            // 程度副词
+            '非常': '非常', '很': '非常', '特别': '非常', '十分': '非常', '相当': '非常',
+            // be动词
+            '是': '是', '为': '是', '算': '是',
+            // 有
+            '有': '有', '存在': '有', '拥有': '有',
+            // 喜欢
+            '喜欢': '喜欢', '爱': '喜欢', '喜爱': '喜欢',
+            // 人
+            '人': '人', '家伙': '人', '人物': '人',
+            // 住
+            '住': '住', '居住': '住', '生活在': '住',
+            // 工作
+            '工作': '工作', '干活': '工作', '上班': '工作',
+            // 学习
+            '学习': '学习', '读书': '学习',
+            // 吃
+            '吃': '吃', '吃饭': '吃', '用餐': '吃',
+            // 喝
+            '喝': '喝', '喝水': '喝', '饮酒': '喝',
+            // 走
+            '走': '走', '行走': '走', '步行': '走', '走路': '走',
+            // 去
+            '去': '去', '前往': '去', '离去': '去', '到': '去',
+            // 来
+            '来': '来', '来到': '来', '前来': '来',
+            // 读
+            '读': '读', '读书': '读', '阅读': '读',
+            // 写
+            '写': '写', '书写': '写', '写作': '写',
+            // 知道
+            '知道': '知道', '懂': '知道', '了解': '知道', '明白': '知道',
+            // 想/认为
+            '想': '想', '思考': '想', '认为': '想', '觉得': '想',
+            // 要/希望
+            '要': '要', '想要': '要', '希望': '要',
+            // 能
+            '能': '能', '会': '能', '可以': '能',
+            // 大
+            '大': '大', '大号': '大', '大一点': '大', '巨大': '大',
+            // 小
+            '小': '小', '小号': '小',
+            // 新
+            '新': '新', '新的': '新',
+            // 旧
+            '旧': '旧', '老的': '旧',
+            // 快
+            '快': '快', '迅速': '快', '快的': '快',
+            // 慢
+            '慢': '慢', '缓慢': '慢',
+            // 热
+            '热': '热', '热天': '热', '暖和': '热',
+            // 冷
+            '冷': '冷', '寒冷': '冷',
+            // 开心
+            '开心': '开心', '高兴': '开心', '快乐': '开心', '愉快': '开心',
+            // 累
+            '累': '累', '疲惫': '累', '疲劳': '累',
+            // 开始
+            '开始': '开始', '起步': '开始',
+            // 找/发现
+            '找': '找', '寻找': '找', '发现': '找',
+            // 国家
+            '加拿大': '加拿大', '美国': '美国', '英国': '英国', '法国': '法国',
+            '中国': '中国', '日本': '日本', '韩国': '韩国',
+            // 孩子
+            '孩子': '孩子', '儿童': '孩子',
+            // 家
+            '家': '家', '房子': '家', 'home': '家',
+            // 朋友
+            '朋友': '朋友', '好友': '朋友', '友人': '朋友',
+            // 学校
+            '学校': '学校', '学院': '学校',
+            // 时间
+            '时间': '时间', '时候': '时间', '时光': '时间',
+            // 今天
+            '今天': '今天', '今日': '今天',
+            // 明天
+            '明天': '明天', '明日': '明天',
+            // 昨天
+            '昨天': '昨天', '昨日': '昨天',
+            // 天气
+            '天气': '天气', '气候': '天气', '气象': '天气',
+        };
+        
+        // ==================== 全局状态 ====================
+        let lessonData = [];
+        let currentSentenceIndex = 0;
+        let currentWordIndex = -1;
+        let correctCount = 0;
+        let skipCount = 0;
+        let totalAttempts = 0;
+        let wrongWords = []; // 易错词记录
+        let isReviewMode = false;
+        
+        // ==================== 翻译 API ====================
+        async function translateWord(word) {
+            try {
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|zh`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.responseStatus === 200) {
+                    return data.responseData.translatedText;
+                }
+            } catch (e) {}
+            return null;
+        }
+        
+        async function translateSentence(sentence) {
+            try {
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(sentence)}&langpair=en|zh`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.responseStatus === 200) {
+                    return data.responseData.translatedText;
+                }
+            } catch (e) {}
+            return sentence;
+        }
+        
+        // ==================== 核心逻辑 ====================
+        async function startLearning() {
+            const sourceText = document.getElementById('sourceText').value.trim();
+            if (!sourceText) {
+                alert('请输入英文句子');
+                return;
+            }
+            
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"><span class="spinner"></span>翻译中...</span>';
+            
+            // 重置状态
+            correctCount = 0;
+            skipCount = 0;
+            totalAttempts = 0;
+            wrongWords = [];
+            isReviewMode = false;
+            lessonData = [];
+            currentSentenceIndex = 0;
+            
+            // 解析句子
+            const sentences = sourceText.split(/[.。!?]+/).filter(s => s.trim());
+            
+            try {
+                for (const s of sentences) {
+                    const source = s.trim();
+                    if (!source) continue;
+                    
+                    const chinese = await translateSentence(source);
+                    const words = parseWords(source, chinese);
+                    
+                    lessonData.push({
+                        text: source,
+                        chinese: chinese,
+                        words: words
+                    });
+                }
+                
+                if (lessonData.length === 0) {
+                    alert('未能解析内容');
+                    return;
+                }
+                
+                // 检查是否有复习词
+                loadWrongWords();
+                document.getElementById('reviewBtn').style.display = wrongWords.length > 0 ? 'inline-block' : 'none';
+                
+                document.getElementById('inputSection').style.display = 'none';
+                document.getElementById('learningSection').classList.add('active');
+                document.getElementById('reviewBanner').style.display = 'none';
+                
+                renderSentence();
+                
+            } catch (e) {
+                console.error(e);
+                alert('翻译失败，请重试');
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '🚀 开始学习';
+        }
+        
+        function parseWords(source, chinese) {
+            const words = source.split(/\s+/).filter(w => w);
+            
+            return words.map(word => {
+                const cleanWord = word.replace(/^[,.!?;:'""]+|[,.!?;:'""]+$/g, '').toLowerCase();
+                
+                // 检查语法词
+                if (grammarWords[cleanWord]) {
+                    return {
+                        word: word,
+                        cleanWord: cleanWord,
+                        type: 'grammar',
+                        ...grammarWords[cleanWord]
+                    };
+                }
+                
+                // 检查词典（新格式：{answer, pos}）
+                if (dictionary[cleanWord]) {
+                    const entry = dictionary[cleanWord];
+                    const answerText = typeof entry === 'object' ? entry.answer : entry;
+                    const posText = typeof entry === 'object' ? entry.pos : '';
+                    return {
+                        word: word,
+                        cleanWord: cleanWord,
+                        type: 'content',
+                        answer: answerText,
+                        pos: posText,
+                        alternatives: getAlternatives(cleanWord)
+                    };
+                }
+                
+                // 未知词，查询API
+                return {
+                    word: word,
+                    cleanWord: cleanWord,
+                    type: 'unknown',
+                    answer: '', // 待查询
+                    alternatives: []
+                };
+            });
+        }
+        
+        function getAlternatives(word) {
+            // 返回同一意思的其他翻译
+            const alts = [];
+            const entry = dictionary[word];
+            if (!entry) return alts;
+            
+            const mainAnswer = typeof entry === 'object' ? entry.answer : entry;
+            if (!mainAnswer) return alts;
+            
+            for (const [key, val] of Object.entries(dictionary)) {
+                if (key === word) continue;
+                const valAnswer = typeof val === 'object' ? val.answer : val;
+                if (valAnswer === mainAnswer) {
+                    alts.push(valAnswer);
+                }
+            }
+            return [...new Set(alts)];
+        }
+        
+        async function queryUnknownWord(wordObj) {
+            if (wordObj.answer) return wordObj;
+            
+            const translation = await translateWord(wordObj.cleanWord);
+            if (translation && translation !== wordObj.cleanWord) {
+                wordObj.answer = translation;
+                // 加入词典缓存（新格式）
+                dictionary[wordObj.cleanWord] = { answer: translation, pos: '' };
+            }
+            return wordObj;
+        }
+        
+        // ==================== 判断逻辑 ====================
+        function checkAnswer(input, correct) {
+            if (!input || !input.trim()) return false;
+            if (!correct) return false;
+            
+            const inp = input.trim().toLowerCase().replace(/[（）]/g, '').trim();
+            const corr = correct.toLowerCase().replace(/[（）]/g, '').trim();
+            
+            // 1. 完全一致
+            if (inp === corr) return true;
+            
+            // 2. 子串匹配（核心字）- 只要用户输入是答案的子串，或答案是用户输入的子串
+            if (corr.includes(inp) || inp.includes(corr)) return true;
+            
+            // 3. 去除"的"比较
+            if (corr.replace(/的/g, '') === inp) return true;
+            
+            // 4. 多义词分隔（用 / 分隔的多个意思）
+            const corrParts = corr.split('/').map(s => s.trim());
+            for (const part of corrParts) {
+                if (part === inp) return true;
+                // 子串匹配也适用于分隔后的每个部分
+                if (part.includes(inp) || inp.includes(part)) return true;
+            }
+            
+            // 5. 同义词映射 - 双向检查
+            const inpCanon = synonyms[inp] || inp;
+            const corrCanon = synonyms[corr] || corr;
+            if (inpCanon === corrCanon) return true;
+            
+            // 6. 输入映射后的值是否包含在答案中，或答案包含输入映射后的值
+            if (corr.includes(inpCanon) || inpCanon.includes(corrCanon)) return true;
+            
+            // 7. 检查分隔后的每个答案部分是否和输入的同义词映射相同
+            for (const part of corrParts) {
+                const partCanon = synonyms[part] || part;
+                if (partCanon === inpCanon) return true;
+            }
+            
+            // 8. 检查输入是否在同义词表里，且和答案映射到同一组
+            for (const [alias, canon] of Object.entries(synonyms)) {
+                if ((inp === alias || inpCanon === alias) && (corr === alias || corrCanon === alias)) {
+                    return true;
+                }
+                // 也检查分隔后的答案部分
+                for (const part of corrParts) {
+                    const partCanon = synonyms[part] || part;
+                    if ((inp === alias || inpCanon === alias) && (part === alias || partCanon === alias)) {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+        
+        // ==================== 渲染 ====================
+        function renderSentence() {
+            if (currentSentenceIndex >= lessonData.length) {
+                renderComplete();
+                return;
+            }
+            
+            const sentence = lessonData[currentSentenceIndex];
+            const container = document.getElementById('sentenceContainer');
+            
+            let html = `
+                <div class="sentence-card">
+                    <div class="sentence-header">
+                        <span class="sentence-number">第 ${currentSentenceIndex + 1} / ${lessonData.length} 句</span>
+                        <span class="sentence-nav">剩余 ${lessonData.length - currentSentenceIndex - 1} 句</span>
+                    </div>
+                    
+                    <div class="chinese-sentence">📖 ${sentence.chinese}</div>
+                    
+                    <div class="source-sentence">
+            `;
+            
+            sentence.words.forEach((w, idx) => {
+                const wordClass = w.type === 'grammar' ? 'word grammar' : 'word';
+                const statusClass = getWordStatus(w, idx);
+                const displayClass = statusClass ? `${wordClass} ${statusClass}` : wordClass;
+                
+                // 更详细的提示
+                let tooltip = '';
+                if (w.answer) {
+                    tooltip = w.pos ? `${w.answer} [${w.pos}]` : w.answer;
+                }
+                const title = tooltip ? `title="${tooltip}"` : '';
+                
+                html += `<span class="${displayClass}" data-index="${idx}" onclick="onWordClick(${idx})" ${title}>${w.word}</span>`;
+            });
+            
+            html += `</div>`;
+            
+            // 猜词面板（隐藏状态）
+            html += `
+                <div class="guess-panel" id="guessPanel"></div>
+            `;
+            
+            html += `</div>`;
+            container.innerHTML = html;
+            
+            updateControls();
+            updateStats();
+        }
+        
+        function getWordStatus(w, idx) {
+            const key = `${currentSentenceIndex}-${idx}`;
+            if (w.type === 'grammar' && w.explanation) {
+                return 'guessed'; // 语法词自动标记为已学
+            }
+            if (w.skipped) return 'skipped';
+            if (w.guessed === true) return 'guessed';
+            if (w.guessed === false) return 'wrong';
+            return '';
+        }
+        
+        async function onWordClick(idx) {
+            const key = `${currentSentenceIndex}-${idx}`;
+            const word = lessonData[currentSentenceIndex].words[idx];
+            
+            // 语法词直接显示答案
+            if (word.type === 'grammar') {
+                showGrammarInfo(word);
+                return;
+            }
+            
+            // 查询未知词
+            if (word.type === 'unknown' && !word.answer) {
+                await queryUnknownWord(word);
+            }
+            
+            currentWordIndex = idx;
+            showGuessPanel(word);
+        }
+        
+        function showGrammarInfo(word) {
+            const panel = document.getElementById('guessPanel');
+            panel.innerHTML = `
+                <div class="guess-header">
+                    <div class="guess-word">${word.word}</div>
+                    <button class="close-btn" onclick="closePanel()">✕ 关闭</button>
+                </div>
+                
+                <div class="grammar-info">
+                    <h4>📝 语法词：${word.answer}</h4>
+                    <p>${word.explanation || '这是一个语法词，表示语法关系而非具体意思。'}</p>
+                    ${word.example ? `<div class="grammar-example">例：${word.example}</div>` : ''}
+                </div>
+                
+                <div class="hint-area">
+                    <div class="hint-label">💡 学习提示</div>
+                    <div class="hint-text">语法词不用猜！记住它的用法才是关键。</div>
+                </div>
+                
+                <button class="btn btn-primary" style="width:100%" onclick="closePanel()">我记住了 ✓</button>
+            `;
+            panel.classList.add('active');
+            
+            // 自动标记为已学
+            word.guessed = true;
+            updateWordDisplay(currentSentenceIndex, currentWordIndex);
+            updateStats();
+        }
+        
+        function showGuessPanel(word) {
+            const panel = document.getElementById('guessPanel');
+            const posLabel = word.pos ? `<span class="pos-tag">${word.pos}</span>` : '';
+            const posHint = word.pos ? getPosHint(word.pos) : '';
+            
+            // 获取当前句子并高亮目标词
+            const sentence = lessonData[currentSentenceIndex];
+            const sentenceText = sentence.text;
+            const wordIndex = sentenceText.toLowerCase().indexOf(word.word.toLowerCase());
+            let highlightedSentence = sentenceText;
+            if (wordIndex !== -1) {
+                highlightedSentence = 
+                    sentenceText.substring(0, wordIndex) + 
+                    `<mark style="background:rgba(79,172,254,0.3);padding:2px 4px;border-radius:4px;">` + 
+                    sentenceText.substring(wordIndex, wordIndex + word.word.length) + 
+                    `</mark>` + 
+                    sentenceText.substring(wordIndex + word.word.length);
+            }
+            
+            panel.innerHTML = `
+                <div class="guess-header">
+                    <div class="guess-word">${word.word} ${posLabel}</div>
+                    <div class="guess-actions">
+                        <button class="audio-btn" onclick="playAudio('${word.cleanWord}')">🔊 发音</button>
+                        <button class="close-btn" onclick="closePanel()">✕</button>
+                    </div>
+                </div>
+                
+                <div class="context-card">
+                    <div class="context-label">📖 句子语境（蓝色高亮为目标词）</div>
+                    <div style="font-family:Georgia,serif;line-height:1.8">${highlightedSentence}</div>
+                    <div style="color:#fee140;margin-top:8px">${sentence.chinese}</div>
+                </div>
+                
+                <div class="input-area">
+                    <input type="text" class="guess-input" id="guessInput" placeholder="输入这个词的中文意思...">
+                    <div class="guess-hint">💡 ${posHint || '可以输入完整意思，也可以输入核心字'}</div>
+                </div>
+                
+                <div class="submit-row">
+                    <button class="btn btn-secondary" onclick="skipWord()">⏭️ 跳过</button>
+                    <button class="btn btn-primary" style="flex:1" onclick="submitGuess()">✓ 确认</button>
+                </div>
+                
+                <div class="result-panel" id="resultPanel"></div>
+            `;
+            panel.classList.add('active');
+            
+            document.getElementById('guessInput').focus();
+            document.getElementById('guessInput').onkeypress = (e) => {
+                if (e.key === 'Enter') submitGuess();
+            };
+        }
+        
+        function getPosHint(pos) {
+            if (pos.includes('v.')) return '动词：想想"做什么"或"是什么状态"';
+            if (pos.includes('n.')) return '名词：想想"什么东西"或"什么人"';
+            if (pos.includes('adj.')) return '形容词：想想"什么样的"';
+            if (pos.includes('adv.')) return '副词：想想"怎么做"';
+            if (pos.includes('pron.')) return '代词：想想"代替什么"';
+            if (pos.includes('prep.')) return '介词：想想"和...什么关系"';
+            if (pos.includes('conj.')) return '连词：想想"连接什么"';
+            if (pos.includes('det.')) return '限定词：想想"多少/哪些"';
+            if (pos.includes('num.')) return '数词：想想"第几"或"多少"';
+            return '';
+        }
+        
+        function submitGuess() {
+            const input = document.getElementById('guessInput').value;
+            const word = lessonData[currentSentenceIndex].words[currentWordIndex];
+            
+            if (!input || !input.trim()) return;
+            
+            totalAttempts++;
+            const isCorrect = checkAnswer(input, word.answer);
+            
+            if (isCorrect) {
+                correctCount++;
+                word.guessed = true;
+            } else {
+                word.guessed = false;
+                // 记录易错词
+                const wrongKey = `${word.cleanWord}|${word.answer}`;
+                if (!wrongWords.includes(wrongKey)) {
+                    wrongWords.push(wrongKey);
+                    saveWrongWords();
+                    document.getElementById('reviewBtn').style.display = 'inline-block';
+                }
+            }
+            
+            showResult(word, input, isCorrect);
+            updateWordDisplay(currentSentenceIndex, currentWordIndex);
+            updateStats();
+        }
+        
+        function skipWord() {
+            const word = lessonData[currentSentenceIndex].words[currentWordIndex];
+            word.skipped = true;
+            skipCount++;
+            
+            const posLabel = word.pos ? `<span class="pos-tag">${word.pos}</span>` : '';
+            const posHint = getPosHint(word.pos || '');
+            
+            document.getElementById('resultPanel').innerHTML = `
+                <div class="result-panel skip show">
+                    <div class="result-title">⏭️ 已跳过</div>
+                    <div class="result-answer">
+                        <span class="correct-label">正确答案：</span>
+                        <strong>${word.answer || '（待查询）'}</strong>
+                        ${posLabel}
+                    </div>
+                    <div class="result-explanation">
+                        💡 ${posHint || '记住这个意思，下次遇到就会了！'}
+                        <br>跳过不丢人，回头复习就好~
+                    </div>
+                </div>
+            `;
+            
+            updateWordDisplay(currentSentenceIndex, currentWordIndex);
+            updateStats();
+        }
+        
+        function showResult(word, input, isCorrect) {
+            const resultPanel = document.getElementById('resultPanel');
+            const posLabel = word.pos ? `<span class="pos-tag">${word.pos}</span>` : '';
+            
+            let html = `
+                <div class="result-panel ${isCorrect ? 'correct' : 'wrong'} show">
+                    <div class="result-title">${isCorrect ? '🎉 正确！' : '🤔 不太对哦'}</div>
+            `;
+            
+            if (isCorrect) {
+                html += `<div class="result-explanation">👍 你猜对了！`;
+                if (word.pos) {
+                    html += ` <span class="pos-tag">${word.pos}</span>`;
+                }
+                if (word.alternatives && word.alternatives.length > 0) {
+                    html += `<br>📝 同义表达：${word.alternatives.join('、')}`;
+                }
+                html += `</div>`;
+            } else {
+                // 改进的错误提示 - 更醒目的答案显示
+                const userAnswer = input.trim();
+                const correctAnswer = word.answer || '（未知）';
+                
+                html += `
+                    <div style="background:rgba(79,172,254,0.15);border:2px solid #4facfe;border-radius:10px;padding:15px;margin-bottom:15px;text-align:center;">
+                        <div style="color:#888;font-size:0.9rem;margin-bottom:8px;">✏️ 你的答案</div>
+                        <div style="font-size:1.1rem;color:#fff;">"${userAnswer}"</div>
+                        <div style="color:#666;margin-top:5px;">↓</div>
+                        <div style="color:#888;font-size:0.9rem;margin-top:8px;">✓ 正确答案</div>
+                        <div style="font-size:1.5rem;color:#4facfe;font-weight:bold;margin-top:5px;">${correctAnswer}</div>
+                        ${posLabel ? `<span class="pos-tag" style="margin-top:10px;">${posLabel}</span>` : ''}
+                    </div>
+                `;
+                
+                // 根据不同情况给出不同的提示（答案已在上方醒目显示）
+                const posHints = {
+                    'v.': '动词，想想"做什么"？',
+                    'n.': '名词，想想"什么东西"？',
+                    'adj.': '形容词，想想"什么样的"？',
+                    'adv.': '副词，想想"怎么做"？',
+                    'prep.': '介词，想想"和...什么关系"？',
+                    'conj.': '连词，想想"连接什么"？',
+                    'pron.': '代词，想想"代替什么"？',
+                };
+                
+                let hintText = '';
+                for (const [pos, hint] of Object.entries(posHints)) {
+                    if (word.pos && word.pos.includes(pos)) {
+                        hintText = hint;
+                        break;
+                    }
+                }
+                
+                if (hintText) {
+                    html += `<div style="color:#888;font-size:0.95rem;text-align:center;margin-top:10px;">💡 提示：${hintText}</div>`;
+                }
+            }
+            
+            html += `</div>`;
+            resultPanel.innerHTML = html;
+            
+            // 自动关闭（正确时）
+            if (isCorrect) {
+                setTimeout(closePanel, 2000);
+            }
+        }
+        
+        function closePanel() {
+            document.getElementById('guessPanel').classList.remove('active');
+            currentWordIndex = -1;
+        }
+        
+        function updateWordDisplay(sentenceIdx, wordIdx) {
+            const wordEl = document.querySelector(`.word[data-index="${wordIdx}"]`);
+            if (wordEl) {
+                const word = lessonData[sentenceIdx].words[wordIdx];
+                const status = getWordStatus(word, wordIdx);
+                wordEl.className = `word ${word.type === 'grammar' ? 'grammar' : ''} ${status}`;
+                if (word.answer) {
+                    wordEl.title = word.answer;
+                }
+            }
+        }
+        
+        function updateStats() {
+            const total = lessonData.reduce((sum, s) => sum + s.words.filter(w => w.type !== 'grammar').length, 0);
+            const completed = lessonData.reduce((sum, s) => sum + s.words.filter(w => w.guessed === true || w.skipped || w.type === 'grammar').length, 0);
+            
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('skipCount').textContent = skipCount;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('accuracy').textContent = 
+                totalAttempts > 0 ? Math.round((correctCount / totalAttempts) * 100) : 0;
+            
+            const percent = total > 0 ? (completed / total) * 100 : 0;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+        
+        function updateControls() {
+            const controls = document.getElementById('controls');
+            controls.innerHTML = `
+                <button class="btn btn-secondary" onclick="prevSentence()" ${currentSentenceIndex === 0 ? 'disabled' : ''}>
+                    ⬅️ 上一句
+                </button>
+                <button class="btn btn-secondary" onclick="nextSentence()" ${currentSentenceIndex >= lessonData.length - 1 ? 'disabled' : ''}>
+                    下一句 ➡️
+                </button>
+            `;
+        }
+        
+        function prevSentence() {
+            if (currentSentenceIndex > 0) {
+                currentSentenceIndex--;
+                closePanel();
+                renderSentence();
+            }
+        }
+        
+        function nextSentence() {
+            if (currentSentenceIndex < lessonData.length - 1) {
+                currentSentenceIndex++;
+                closePanel();
+                renderSentence();
+            }
+        }
+        
+        function renderComplete() {
+            const container = document.getElementById('sentenceContainer');
+            container.innerHTML = `
+                <div class="sentence-card">
+                    <div class="complete-card">
+                        <h2>🎉 学习完成！</h2>
+                        <div class="complete-stats">
+                            <div class="complete-stat">
+                                <div class="complete-stat-value">${correctCount}</div>
+                                <div class="complete-stat-label">答对</div>
+                            </div>
+                            <div class="complete-stat">
+                                <div class="complete-stat-value">${skipCount}</div>
+                                <div class="complete-stat-label">跳过</div>
+                            </div>
+                            <div class="complete-stat">
+                                <div class="complete-stat-value">${wrongWords.length}</div>
+                                <div class="complete-stat-label">易错词</div>
+                            </div>
+                            <div class="complete-stat">
+                                <div class="complete-stat-value">${totalAttempts > 0 ? Math.round((correctCount / totalAttempts) * 100) : 0}%</div>
+                                <div class="complete-stat-label">正确率</div>
+                            </div>
+                        </div>
+                        ${wrongWords.length > 0 ? '<p style="color:#888;margin-bottom:20px">有易错词需要复习哦~</p>' : ''}
+                        <button class="btn btn-primary" onclick="resetLearning()">继续学习更多</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('controls').innerHTML = '';
+        }
+        
+        // ==================== 复习模式 ====================
+        function startReview() {
+            if (wrongWords.length === 0) return;
+            
+            isReviewMode = true;
+            currentSentenceIndex = 0;
+            correctCount = 0;
+            skipCount = 0;
+            totalAttempts = 0;
+            
+            // 构建复习数据
+            lessonData = wrongWords.map(item => {
+                const [word, answer] = item.split('|');
+                return {
+                    text: word,
+                    chinese: '复习模式',
+                    words: [{
+                        word: word,
+                        cleanWord: word.toLowerCase(),
+                        type: 'content',
+                        answer: answer,
+                        alternatives: []
+                    }]
+                };
+            });
+            
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('learningSection').classList.add('active');
+            document.getElementById('reviewBanner').style.display = 'block';
+            
+            renderSentence();
+        }
+        
+        // ==================== 持久化 ====================
+        function saveWrongWords() {
+            localStorage.setItem('en-learning-wrong-words', JSON.stringify(wrongWords));
+        }
+        
+        function loadWrongWords() {
+            try {
+                const saved = localStorage.getItem('en-learning-wrong-words');
+                if (saved) {
+                    wrongWords = JSON.parse(saved);
+                }
+            } catch (e) {}
+        }
+        
+        function resetLearning() {
+            closePanel();
+            document.getElementById('learningSection').classList.remove('active');
+            document.getElementById('inputSection').style.display = 'block';
+            document.getElementById('sourceText').value = '';
+            loadWrongWords();
+            document.getElementById('reviewBtn').style.display = wrongWords.length > 0 ? 'inline-block' : 'none';
+        }
+        
+        // ==================== 发音 ====================
+        function playAudio(word) {
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85;
+            speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>
