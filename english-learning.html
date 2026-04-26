@@ -1653,13 +1653,33 @@ When I was a child, I lived in Canada with my family."></textarea>
         // ==================== 翻译 API ====================
         async function translateWord(word) {
             try {
-                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|zh`;
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data.responseStatus === 200) {
-                    return data.responseData.translatedText;
+                // 使用 Free Dictionary API（最权威的免费英语词典）
+                const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data[0]) {
+                        // 优先取中文释义，没有中文就用英文
+                        for (const meaning of data[0].meanings || []) {
+                            for (const def of meaning.definitions || []) {
+                                if (def.translations && def.translations.length > 0) {
+                                    return def.translations[0].text;
+                                }
+                            }
+                            // 如果没有中文翻译，用英文释义
+                            if (meaning.partOfSpeech && !meaning.partOfSpeech.includes('.')) {
+                                // 跳过无效的词性
+                            }
+                        }
+                        // 最后回退：取第一个定义的英文释义
+                        const firstDef = data[0].meanings?.[0]?.definitions?.[0]?.definition;
+                        if (firstDef) {
+                            return `[${data[0].meanings[0].partOfSpeech}] ${firstDef}`;
+                        }
+                    }
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error('Dictionary API error:', e);
+            }
             return null;
         }
         
@@ -1805,7 +1825,7 @@ When I was a child, I lived in Canada with my family."></textarea>
             const translation = await translateWord(wordObj.cleanWord);
             if (translation && translation !== wordObj.cleanWord) {
                 wordObj.answer = translation;
-                // 加入词典缓存（新格式）
+                // 加入词典缓存
                 dictionary[wordObj.cleanWord] = { answer: translation, pos: '' };
             }
             return wordObj;
@@ -1939,13 +1959,75 @@ When I was a child, I lived in Canada with my family."></textarea>
                 return;
             }
             
-            // 查询未知词
-            if (word.type === 'unknown' && !word.answer) {
-                await queryUnknownWord(word);
+            // 未知词：查询后直接显示答案（不需要猜，因为用户不知道这个词的意思）
+            if (word.type === 'unknown' || !word.answer) {
+                currentWordIndex = idx;
+                const fetched = await queryUnknownWord(word);
+                showUnknownWordInfo(fetched);
+                return;
             }
             
             currentWordIndex = idx;
             showGuessPanel(word);
+        }
+        
+        function showUnknownWordInfo(word) {
+            const panel = document.getElementById('guessPanel');
+            const posLabel = word.pos ? `<span class="pos-tag">${word.pos}</span>` : '';
+            
+            // 获取当前句子并高亮目标词
+            const sentence = lessonData[currentSentenceIndex];
+            const sentenceText = sentence.text;
+            const wordIndex = sentenceText.toLowerCase().indexOf(word.word.toLowerCase());
+            let highlightedSentence = sentenceText;
+            if (wordIndex !== -1) {
+                highlightedSentence = 
+                    sentenceText.substring(0, wordIndex) + 
+                    `<mark style="background:rgba(79,172,254,0.3);padding:2px 4px;border-radius:4px;">` + 
+                    sentenceText.substring(wordIndex, wordIndex + word.word.length) + 
+                    `</mark>` + 
+                    sentenceText.substring(wordIndex + word.word.length);
+            }
+            
+            panel.innerHTML = `
+                <div class="guess-header">
+                    <div class="guess-word">${word.word} ${posLabel}</div>
+                    <div class="guess-actions">
+                        <button class="audio-btn" onclick="playAudio('${word.cleanWord}')">🔊 发音</button>
+                        <button class="close-btn" onclick="closePanel()">✕</button>
+                    </div>
+                </div>
+                
+                <div class="context-card">
+                    <div class="context-label">📖 句子语境</div>
+                    <div style="font-family:Georgia,serif;line-height:1.8">${highlightedSentence}</div>
+                    <div style="color:#fee140;margin-top:8px">${sentence.chinese}</div>
+                </div>
+                
+                <div style="background:rgba(79,172,254,0.15);border:2px solid #4facfe;border-radius:10px;padding:20px;margin:15px 0;text-align:center;">
+                    <div style="color:#888;font-size:0.9rem;margin-bottom:8px;">这个词在词典里没有，我帮你查了一下</div>
+                    <div style="font-size:1.5rem;color:#4facfe;font-weight:bold;">${word.answer}</div>
+                    ${posLabel ? `<span class="pos-tag" style="margin-top:10px;">${word.pos}</span>` : ''}
+                </div>
+                
+                <div class="hint-area">
+                    <div class="hint-label">💡 记忆提示</div>
+                    <div class="hint-text">把这个词记在脑子里，下次再遇到就认识啦！</div>
+                </div>
+                
+                <button class="btn btn-primary" style="width:100%" onclick="markAsLearnedAndClose()">记住了 ✓</button>
+            `;
+            panel.classList.add('active');
+        }
+        
+        function markAsLearnedAndClose() {
+            const word = lessonData[currentSentenceIndex].words[currentWordIndex];
+            if (word) {
+                word.guessed = true;
+                updateWordDisplay(currentSentenceIndex, currentWordIndex);
+                updateStats();
+            }
+            closePanel();
         }
         
         function showGrammarInfo(word) {
