@@ -928,6 +928,8 @@ When I was a child, I lived in Canada with my family."></textarea>
         
         // 动词-ing形式
         const verbIngDict = {
+            'doing': { answer: '做/干', pos: 'v.' },
+            'making': { answer: '做/制造', pos: 'v.' },
             'looking': { answer: '看', pos: 'v.' },
             'seeing': { answer: '看见', pos: 'v.' },
             'watching': { answer: '观看', pos: 'v.' },
@@ -1256,111 +1258,14 @@ When I was a child, I lived in Canada with my family."></textarea>
             ...adverbDict,
         };
         
-        // 同义词映射（用于宽松判断）
-            // 地名/国家
-            'canada': '加拿大', 'america': '美国', 'usa': '美国', 'us': '美国',
-            'china': '中国', 'japan': '日本', 'korea': '韩国', 'uk': '英国',
-            'britain': '英国', 'france': '法国', 'germany': '德国', 'russia': '俄罗斯',
-            'india': '印度', 'brazil': '巴西', 'australia': '澳大利亚',
-            'toronto': '多伦多', 'vancouver': '温哥华', 'newyork': '纽约', 'nyc': '纽约',
-            'london': '伦敦', 'paris': '巴黎', 'tokyo': '东京', 'beijing': '北京',
-            'sydney': '悉尼', 'singapore': '新加坡', 'seoul': '首尔',
+        // 同义词映射（宽松判断）- 全部使用字符串格式
+        const synonyms = {
+            // 中文到中文的映射（让同义词匹配更宽松）
+            '做': '做/干', '干': '做/干', '做事情': '做/干', '进行': '做/干',
+            '说': '说/讲', '讲话': '说/讲', '谈话': '说/讲', '说话': '说/讲',
+            '看': '看/看见', '看见': '看/看见', '看到': '看/看见',
+            '美丽': '美丽/漂亮', '漂亮': '美丽/漂亮', '好看': '美丽/漂亮',
             
-            // 人名
-            'john': '约翰', 'mary': '玛丽', 'james': '詹姆斯', 'sarah': '莎拉',
-            'tom': '汤姆', 'lucy': '露西', 'jack': '杰克', 'rose': '玫瑰',
-            
-            // 常用动词（原型）
-            'am': '是', 'look': '看', 'see': '看', 'watch': '看',
-            'eat': '吃', 'drink': '喝', 'cook': '烹饪', 'food': '食物',
-            'go': '去', 'come': '来', 'walk': '走', 'run': '跑', 'fly': '飞',
-            'say': '说', 'speak': '说', 'talk': '谈话', 'tell': '告诉',
-            'hear': '听', 'listen': '听',
-            'read': '读', 'write': '写',
-            'love': '爱', 'like': '喜欢', 'hate': '讨厌',
-            'think': '想/认为', 'want': '想要', 'need': '需要',
-            'live': '住/生活', 'sleep': '睡', 'sit': '坐', 'stand': '站',
-            'play': '玩', 'study': '学习', 'learn': '学习', 'teach': '教',
-            'open': '开', 'close': '关', 'put': '放', 'take': '拿/带走',
-            'buy': '买', 'sell': '卖', 'give': '给', 'get': '得到', 'find': '找/发现',
-            'know': '知道', 'remember': '记住', 'forget': '忘记', 'meet': '遇见',
-            'ask': '问', 'answer': '回答', 'help': '帮助',
-            'feel': '感觉', 'understand': '理解', 'believe': '相信', 'try': '尝试',
-            'start': '开始', 'stop': '停止', 'stay': '留下', 'leave': '离开',
-            'enjoy': '享受', 'hope': '希望', 'work': '工作', 'call': '叫/打电话',
-            
-            // 动词-ing形式
-            'looking': '看', 'seeing': '看', 'watching': '看',
-            'eating': '吃', 'drinking': '喝',
-            'going': '去', 'coming': '来', 'walking': '走', 'running': '跑', 'flying': '飞',
-            'saying': '说', 'speaking': '说', 'talking': '说',
-            'reading': '读', 'writing': '写',
-            'loving': '爱', 'liking': '喜欢', 'hating': '讨厌',
-            'thinking': '想', 'wanting': '想要', 'needing': '需要',
-            'living': '住', 'sleeping': '睡',
-            'playing': '玩', 'studying': '学习', 'learning': '学习',
-            'working': '工作', 'trying': '尝试', 'helping': '帮助',
-            'feeling': '感觉', 'knowing': '知道', 'remembering': '记住',
-            'waiting': '等待', 'using': '使用', 'making': '做/制造',
-            
-            // 动词-ed形式
-            'looked': '看', 'saw': '看见', 'watched': '看',
-            'ate': '吃', 'drank': '喝',
-            'went': '去', 'came': '来', 'walked': '走', 'ran': '跑',
-            'said': '说', 'spoke': '说',
-            'read': '读', 'wrote': '写',
-            'loved': '爱', 'liked': '喜欢', 'hated': '讨厌',
-            'thought': '想', 'wanted': '想要', 'needed': '需要',
-            'lived': '住', 'slept': '睡',
-            'worked': '工作', 'played': '玩', 'studied': '学习', 'learned': '学习',
-            'found': '找/发现', 'gave': '给', 'took': '拿', 'made': '做',
-            'knew': '知道', 'remembered': '记住', 'forgot': '忘记',
-            'started': '开始', 'stopped': '停止', 'asked': '问', 'told': '告诉',
-            
-            // 形容词
-            'beautiful': '美丽', 'pretty': '漂亮', 'ugly': '丑',
-            'good': '好', 'great': '好/棒', 'wonderful': '棒极了',
-            'bad': '坏', 'awful': '糟糕', 'terrible': '可怕',
-            'big': '大', 'small': '小', 'large': '大', 'huge': '巨大',
-            'new': '新', 'old': '旧/老', 'young': '年轻',
-            'hot': '热', 'cold': '冷', 'warm': '暖和', 'cool': '凉快',
-            'happy': '开心', 'sad': '伤心', 'angry': '生气', 'tired': '累',
-            'difficult': '困难', 'easy': '容易', 'important': '重要',
-            'different': '不同', 'same': '一样', 'possible': '可能',
-            'right': '正确', 'wrong': '错误', 'true': '真实', 'real': '真的',
-            'late': '晚', 'early': '早', 'ready': '准备好',
-            'amazing': '惊人', 'interesting': '有趣', 'boring': '无聊',
-            'delicious': '好吃', 'nice': '好', 'lovely': '可爱',
-            
-            // 名词
-            'student': { answer: '学生', pos: 'n.' },
-            'teacher': { answer: '老师', pos: 'n.' },
-            'school': { answer: '学校', pos: 'n.' },
-            'friend': { answer: '朋友', pos: 'n.' },
-            'today': { answer: '今天', pos: 'n./adv.' },
-            'tomorrow': { answer: '明天', pos: 'n./adv.' },
-            'yesterday': { answer: '昨天', pos: 'n./adv.' },
-            'weather': { answer: '天气', pos: 'n.' },
-            'rain': { answer: '雨/下雨', pos: 'n./v.' },
-            'sun': { answer: '太阳', pos: 'n.' },
-            'snow': { answer: '雪/下雪', pos: 'n./v.' },
-            'sky': { answer: '天空', pos: 'n.' },
-            'book': { answer: '书', pos: 'n.' },
-            'paper': { answer: '纸/报纸', pos: 'n.' },
-            'phone': { answer: '手机/电话', pos: 'n.' },
-            'computer': { answer: '电脑', pos: 'n.' },
-            'car': { answer: '汽车', pos: 'n.' },
-            'bus': { answer: '公交车', pos: 'n.' },
-            'train': { answer: '火车', pos: 'n.' },
-            'bike': { answer: '自行车', pos: 'n.' },
-            'house': { answer: '房子', pos: 'n.' },
-            'home': { answer: '家', pos: 'n./adv.' },
-            'room': { answer: '房间', pos: 'n.' },
-            'door': { answer: '门', pos: 'n.' },
-            'window': { answer: '窗户', pos: 'n.' },
-            'family': { answer: '家人/家庭', pos: 'n.' },
-            'father': { answer: '父亲', pos: 'n.' },
-            'mother': { answer: '母亲', pos: 'n.' },
             'dad': { answer: '爸爸', pos: 'n.' },
             'mom': { answer: '妈妈', pos: 'n.' },
             'brother': { answer: '兄弟', pos: 'n.' },
@@ -1637,7 +1542,9 @@ When I was a child, I lived in Canada with my family."></textarea>
         };
         
         // 同义词映射（宽松判断）- 全部使用字符串格式
-        const synonyms = {
+        const synonymsMore = {
+            // 做相关
+            '做': '做', '干': '做', '干活': '做', '进行': '做', '做事情': '做',
             // 看相关
             '看': '看', '看着': '看', '看看': '看', '看到': '看', '看见': '看', '瞧瞧': '看', '观看': '看',
             // 说/说话相关（最宽松匹配）
